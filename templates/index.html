@@ -1,0 +1,23 @@
+{% extends "./base_nav.html" %}
+{% block body_block %}
+
+<div class="container">
+  <div class="jumbotron">
+    <h1>Book Ride</h1>
+    {% if user.is_authenticated %}
+        <h2>Welcome {{ user.username }}!</h2>
+    {% else %}
+        <h2>Welcome to the site!</h2>
+    {% endif %}
+  </div>
+  <div class="mapview">
+    <iframe
+        width="600"
+        height="450"
+        frameborder="0" style="border:0"
+        src="https://www.google.com/maps/embed/v1/view?key=AIzaSyARMmtcRYeXy9_9Y-tiuzFvo_zDtQILkAk&center=20.5937,78.9629" allowfullscreen>
+    </iframe>
+  </div>
+</div>
+
+{% endblock %}
