@@ -10,14 +10,55 @@
         <h2>Welcome to the site!</h2>
     {% endif %}
   </div>
-  <div class="mapview">
-    <iframe
+
+
+  <div class="container px-4 my-4">
+    <div class="row gx-4">
+      <div class="col">
+        <div class="p-3 border">
+          <label for="exampleFormControlInput1" class="form-label">Drop</label>
+          <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="HSR Layout">
+        </div>
+      </div>
+      <div class="col">
+        <div class="p-3 border">
+          <label for="exampleFormControlInput1" class="form-label">Drop</label>
+          <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Lido Mall">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="d-flex justify-content-center mx-2 px2">
+    <iframe  
+      width="600"
+      height="450"
+      frameborder="0" style="border:0"
+      src="https://www.google.com/maps/embed/v1/view?key=AIzaSyARMmtcRYeXy9_9Y-tiuzFvo_zDtQILkAk&center=20.5937,78.9629" allowfullscreen>
+    </iframe>
+  </div>
+
+
+
+  <!-- <div class="jumbotron text-center">
+    <div class="container">
+      <iframe
         width="600"
         height="450"
         frameborder="0" style="border:0"
         src="https://www.google.com/maps/embed/v1/view?key=AIzaSyARMmtcRYeXy9_9Y-tiuzFvo_zDtQILkAk&center=20.5937,78.9629" allowfullscreen>
-    </iframe>
+      </iframe>
+    </div>
+    <div container>
+      <iframe
+        width="600"
+        height="450"
+        frameborder="0" style="border:0"
+        src="https://www.google.com/maps/embed/v1/view?key=AIzaSyARMmtcRYeXy9_9Y-tiuzFvo_zDtQILkAk&center=20.5937,78.9629" allowfullscreen>
+      </iframe>
+    </div>
+    
   </div>
-</div>
+</div> -->
 
 {% endblock %}
