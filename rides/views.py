@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import UserForm
+from .forms import UserSignUp
 
 # Create your views here.
 def index(request):
@@ -14,12 +14,14 @@ def register(request):
 
         # Get info from "both" forms
         # It appears as one form to the user on the .html page
-        user_form = UserForm(data=request.POST)
-        profile_form = UserProfileInfoForm(data=request.POST)
+        user_form = UserSignUp(data=request.POST)
+        
+        
 
         # Check to see both forms are valid
-        if user_form.is_valid() and profile_form.is_valid():
+        if user_form.is_valid():
 
+            if user_form.
             # Save User Form to Database
             user = user_form.save()
 

@@ -15,4 +15,5 @@ class UserSignUp(UserCreationForm):
         widget=forms.CheckboxSelectMultiple,
     )
     class Meta(UserCreationForm.Meta):
+        fields = ('username','name','password')
         model = User

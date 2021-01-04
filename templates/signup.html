@@ -1,0 +1,25 @@
+{% extends "./base_nav.html" %}
+
+{% block body_block %}
+
+{% load static %}
+
+<form enctype="multipart/form-data" method="POST">
+  {% csrf_token %}
+  {{ user_form.as_p }}
+  
+  <div class="form-group">
+    <label for="Name">Name</label>
+    <input type="text" class="form-control" id="full-name" placeholder="Name here..">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Cell Number</label>
+    <input type="number" class="form-control" id="cell"  placeholder="Phone number">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    <input type="number" class="form-control" id="cell"  placeholder="Enter email">
+  </div>
+
+</form>
+{% endblock %}
