@@ -7,13 +7,10 @@ from .models import User
 # from .models import 
 
 class UserSignUp(UserCreationForm):
-    Choices = (
-        ("1","Driver"),
-    )
-    driver = forms.ModelMultipleChoiceField(
-        choices=Choices,
-        widget=forms.CheckboxSelectMultiple,
-    )
+
+    
     class Meta(UserCreationForm.Meta):
         fields = ('username','name','password')
         model = User
+    
+

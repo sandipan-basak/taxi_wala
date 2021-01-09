@@ -21,7 +21,9 @@ def register(request):
         # Check to see both forms are valid
         if user_form.is_valid():
 
-            if user_form.
+            if "driver-enable" in request.POST:
+                
+
             # Save User Form to Database
             user = user_form.save()
 
