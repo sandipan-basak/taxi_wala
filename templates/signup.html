@@ -9,10 +9,14 @@
 <form method="POST">
   {% csrf_token %}
   {{ user_form.as_p }}
+  <div class="form-group">
+    <label for="full-name">Name</label>
+    <input type="text" class="form-control" id="full-name" placeholder="Name here.." required>
+  </div>
   <div class="form-inline">
     <div class="form-group">
-      <label for="full-name">Name</label>
-      <input type="text" class="form-control" id="full-name" placeholder="Name here.." required>
+      <label for="username">Name</label>
+      <input type="text" class="form-control" id="username" placeholder="username.." required>
     </div>
     <div class="form-group">
       <label for="user-password">Password</label>

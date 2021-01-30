@@ -1,0 +1,18 @@
+{% extends "./base_nav.html" %}
+
+{% block body_block %}
+
+{% load static %}
+
+<script src="{% static "js/map_view/search_bars.js" %}" alt="No script"></script>
+
+<div class="container">
+  <div class="jumbotron">
+    <h1>Book Ride</h1>
+    {% if user.is_authenticated %}
+        <h2>Welcome {{ user.username }}</h2>
+    {% else %}
+        <h2>Welcome to the site!</h2>
+    {% endif %}
+  </div>
+{% endblock %}
