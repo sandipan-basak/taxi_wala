@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, ListView, UpdateView
-from .forms import RiderSignUp, ExecSignUp
+# from .forms import RiderSignUp, ExecSignUp
 from .models import Rider, Executive
 
 # Create your views here.
@@ -15,13 +15,13 @@ class RiderSignUpView(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        login(self.request, user)
+        # login(self.request, user)
         return redirect('index.html')
 
-class random(CreateView):
-    def index(request):
-        text = "Hi..!!"
-        return render(request, 'index.html', context={'text':text})
+# class random(CreateView):
+#     def index(request):
+#         text = "Hi..!!"
+#         return render(request, 'index.html', context={'text':text})
 
     #def register(request):
 

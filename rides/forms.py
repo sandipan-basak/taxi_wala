@@ -2,12 +2,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.forms import widgets
-from .models import User, Executive, Rider
+from rides.models import User, Executive, Rider
 
 class RiderSignUpForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
-        fields = ('name', 'user_name', 'password', 'cell')
+        fields = ('name', 'user_name', 'cell')
         model = Rider
 
     def save(self, commit=True):
