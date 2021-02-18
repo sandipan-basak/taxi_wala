@@ -1,35 +1,43 @@
-{% extends "base_nav.html" %}
+{% extends "base.html" %}
 
-{% block body_block %}
+{% block content %}
 
 {% load static %}
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Rides</a>
     <div class="navbar-nav">
-        
-        <a class="nav-item nav-link" href="#">Rango</a>
-
+      {% if user.is_authenticated %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+          <span class="navbar-toggler-icon"></span>
         </button>
-        
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li>
-                    <a class="nav-item nav-link" href="{% url 'rider:book_rides' %}">Get Ride</a>
-                </li>
-                <li>
-                    <a class="nav-item nav-link" href="{% url 'rider:past_rides' %}">Ride History</a>
-                </li>
-            </ul>
+          <ul class="navbar-nav mr-auto">
+            {% if user.is_rider %}
+              <li>
+                <a class="nav-item nav-link" href="{% url 'rider:book' %}">Get Ride</a>
+              </li>
+              <li>
+                <a class="nav-item nav-link" href="{% url 'rider:history' %}">Ride History</a>
+              </li>
+            {% else %}
+              <li>
+                <a class="nav-item nav-link" href="{% url 'exec:alerts' %}">Ride Alerts</a>
+              </li>
+              <li>
+                <a class="nav-item nav-link" href="{% url 'exec:history' %}">Ride History</a>
+              </li>
+              <li>
+                <a class="nav-item nav-link" href="{% url 'exec:payments' %}">Accounts</a>
+              </li>
+            {% endif %}
+          </ul>
         </div>
+      {% endif %}
     </div>
 </nav>
 
-<div class="container">
-    {% block rider_view %}
-    {% endblock %}
-</div>
+
 
 
 {% endblock %}
