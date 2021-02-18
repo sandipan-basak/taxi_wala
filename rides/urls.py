@@ -1,11 +1,11 @@
 from django.urls import path, include
-from rides.views import uber, executive, rider
+from .views import rides, executive, rider
 
 # SET THE NAMESPACE!
 app_name = 'rides'
 
 urlpatterns = [
-    path('', uber.home, name='home'),
+    path('', rides.home, name='home'),
 
     path('r/', include(([
         path('travel/', rider.BoookRideView.as_view(), name='book'),
