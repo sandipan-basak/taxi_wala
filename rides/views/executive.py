@@ -9,12 +9,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView, UpdateView)
 
-from rides.decorators import executive_required
-from rides.forms import ExecutiveSignUpForm
-from rides.models import User, Rider, Rides, Executive
+from ..decorators import executive_required
+from ..forms import ExecutiveSignUpForm
+from ..models import User, Rider, Rides, Executive
 
-class SignUpView(CreateView):
-    model = Executive
+class ExecSignUpView(CreateView):
+    model = User
     form_class = ExecutiveSignUpForm
     template_name = 'registration/signup_form.html'
 

@@ -1,8 +1,6 @@
 from django.urls import path, include
 from .views import rides, executive, rider
 
-# SET THE NAMESPACE!
-app_name = 'rides'
 
 urlpatterns = [
     path('', rides.home, name='home'),
@@ -15,7 +13,7 @@ urlpatterns = [
     path('e/', include(([
         path('live/', executive.Ride_Alert.as_view(), name='alerts'),
         path('payments/', executive.PaymentsView.as_view(), name='payments'),
-    ], 'rides'), namespace='executive')),
+    ], 'rides'), namespace='exec')),
 ]
 
 
