@@ -4,9 +4,12 @@ from django.db import transaction
 from django.forms import widgets
 from rides.models import User, Executive, Rider, Rides
 
+from crispy_forms.helper import FormHelper
+
 class RiderSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
+        fields = ('name', 'username')
 
     @transaction.atomic
     def save(self):
@@ -23,7 +26,7 @@ class ExecutiveSignUpForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('password1', 'password2', 'cell', 'name', 'shift')
+        fields = ('name', 'password1', 'password2', 'shift', 'cell')
        
     @transaction.atomic
     def save(self):
@@ -31,10 +34,10 @@ class ExecutiveSignUpForm(UserCreationForm):
         user.is_executive = True
         user.username = user.name
         ex = Executive.objects.create(user=user)
-        ex.shift.add(*self.cleaned_data.get('shift'))
+        ex.shift
         return user
 
-class BookRideView(forms.ModelForm):    
+class BookRideViewForm(forms.ModelForm):    
     class Meta:
         model = Rides
         fields = ('source','destination',)

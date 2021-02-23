@@ -11,8 +11,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 
 from ..decorators import rider_required
-from ..forms import RiderSignUpForm
-from ..models import User, Rider, Rides, Executive
+from ..forms import RiderSignUpForm, BookRideViewForm
+from ..models import Status, User, Rider, Rides, Executive
 
 class RiderSignUpView(CreateView):
     model = User
@@ -20,8 +20,9 @@ class RiderSignUpView(CreateView):
     template_name = 'registration/signup_form.html'
 
     def get_context_data(self, **kwargs):
-        kwargs['user_type'] = 'rider'
-        print ("rider", kwargs)
+        context = super().get_context_data(**kwargs)
+        context['user_type'] = 'rider'
+        return context
 
     def form_valid(self, form):
         user = form.save()
@@ -30,24 +31,15 @@ class RiderSignUpView(CreateView):
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class BoookRideView(CreateView):
-    # model = Rides
-    # context_object_name = 'quiz'
-    # template_name = 'classroom/teachers/quiz_results.html'
+    model = Rides
 
-    # def get_context_data(self, **kwargs):
-    #     quiz = self.get_object()
-    #     taken_quizzes = quiz.taken_quizzes.select_related('student__user').order_by('-date')
-    #     total_taken_quizzes = taken_quizzes.count()
-    #     quiz_score = quiz.taken_quizzes.aggregate(average_score=Avg('score'))
-    #     extra_context = {
-    #         'taken_quizzes': taken_quizzes,
-    #         'total_taken_quizzes': total_taken_quizzes,
-    #         'quiz_score': quiz_score
-    #     }
-    #     kwargs.update(extra_context)
-    #     return super().get_context_data(**kwargs)
-
-    # def get_queryset(self):
-    #     return self.request.user.quizzes.all()
-
+    form_class = BookRideViewForm
+    template_name = 'rides/rider/get_ride.html'
     pass
+    # def form_valid(self, form):
+    #     ride = form.save(commit = False)
+    #     ride.status = Status.objects.create(name='In Queue', )
+    #     quiz.save()
+    #     messages.success(self.request, 'The quiz was created with success! Go ahead and add some questions now.')
+    #     return redirect('teachers:quiz_change', quiz.pk)
+    #     ride

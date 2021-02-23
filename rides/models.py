@@ -7,7 +7,7 @@ class User(AbstractUser):
     is_rider = models.BooleanField(default=False)
     is_ex = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
-    cell = models.IntegerField(blank=True, unique=True)
+    cell = models.IntegerField(blank=True, null=True, unique=True)
 
 class Location(models.Model):
     pincode = models.CharField(max_length=10)
