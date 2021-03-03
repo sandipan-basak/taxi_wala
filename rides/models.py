@@ -26,11 +26,13 @@ class Executive(models.Model):
     def __str__(self):
         return self.user.username
 
-class Cabs(models.Model):
+class Cab(models.Model):
     number = models.CharField(max_length=20)
     executive = models.OneToOneField(Executive, on_delete=models.CASCADE, primary_key=True)
     lat = models.DecimalField(max_digits=20, decimal_places=14)
     lon = models.DecimalField(max_digits=20, decimal_places=14)
+    class Meta:
+        verbose_name_plural = "Cabs"
 
 class Rider(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -43,6 +45,8 @@ class Status(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = "Status"
 
     def get_html_badge(self):
         name = escape(self.name)
@@ -58,7 +62,7 @@ class Status(models.Model):
 class Rides(models.Model):
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE)
-    cab = models.ForeignKey(Cabs, on_delete=models.CASCADE)
+    cab = models.ForeignKey(Cab, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True, auto_now_add=False)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=11, decimal_places=2)
@@ -67,3 +71,6 @@ class Rides(models.Model):
     
     def __str__(self):
         return self.pk
+
+    class Meta:
+        verbose_name_plural = "Rides"

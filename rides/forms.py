@@ -7,6 +7,12 @@ from rides.models import User, Executive, Rider, Rides
 from crispy_forms.helper import FormHelper
 
 class RiderSignUpForm(UserCreationForm):
+
+    def __init__(self, *args, **kwargs):
+        super(RiderSignUpForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['username', 'password1', 'password2']:
+            self.fields[fieldname].help_text = None
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('name', 'username')
@@ -18,6 +24,8 @@ class RiderSignUpForm(UserCreationForm):
         user.save()
         Rider.objects.create(user=user)
         return user
+
+    
 
 class ExecutiveSignUpForm(UserCreationForm):
     
@@ -37,7 +45,7 @@ class ExecutiveSignUpForm(UserCreationForm):
         ex.shift
         return user
 
-class BookRideViewForm(forms.ModelForm):    
+class BookRideViewForm(forms.ModelForm):
     class Meta:
         model = Rides
         fields = ('source','destination',)

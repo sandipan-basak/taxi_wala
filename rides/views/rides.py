@@ -11,5 +11,5 @@ def home(request):
         if request.user.is_rider:
             return redirect('rider:book')
         else:
-            return redirect('executive:alerts')
+            return redirect('exec:alerts')
     return render(request, 'rides/home.html')

@@ -35,11 +35,11 @@ class BoookRideView(CreateView):
 
     form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
-    pass
-    # def form_valid(self, form):
-    #     ride = form.save(commit = False)
-    #     ride.status = Status.objects.create(name='In Queue', )
-    #     quiz.save()
-    #     messages.success(self.request, 'The quiz was created with success! Go ahead and add some questions now.')
-    #     return redirect('teachers:quiz_change', quiz.pk)
-    #     ride
+    
+    def form_valid(self, form):
+        ride = form.save(commit = False)
+        ride.status = Status.objects.get(name='On Queue')
+        ride.save()
+        # messages.success(self.request, 'The quiz was created with success! Go ahead and add some questions now.')
+        return redirect('rider:travel', quiz.pk)
+        
