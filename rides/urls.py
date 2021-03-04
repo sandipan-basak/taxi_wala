@@ -6,8 +6,8 @@ urlpatterns = [
     path('', rides.home, name='home'),
 
     path('r/', include(([
-        path('travel/', rider.BoookRideView.as_view(), name='book'),
-        # path('/', rider..as_view(), name=''),
+        path('', rider.BookRideView.as_view(), name='book'),
+        path('status/', rider.RideStatusView.as_view(), name='status'),
     ], 'rides'), namespace='rider')),
 
     path('e/', include(([

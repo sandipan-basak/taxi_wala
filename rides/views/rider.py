@@ -30,7 +30,7 @@ class RiderSignUpView(CreateView):
         return redirect('rider:book')
 
 @method_decorator([login_required, rider_required], name='dispatch')
-class BoookRideView(CreateView):
+class BookRideView(CreateView):
     model = Rides
 
     form_class = BookRideViewForm
@@ -41,5 +41,17 @@ class BoookRideView(CreateView):
         ride.status = Status.objects.get(name='On Queue')
         ride.save()
         # messages.success(self.request, 'The quiz was created with success! Go ahead and add some questions now.')
-        return redirect('rider:travel', quiz.pk)
+        return redirect('rider:status', ride.pk)
+        
+
+class RideStatusView(DetailView):
+    model = Rides
+    context_object_name = 'ride'
+    template_name = 'rides/rider/ride_status.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['rider'] = self.get_object().rider
+        kwargs['cabee'] = self.get_object().cabee
+        return super().get_context_data(**kwargs)
+
         
