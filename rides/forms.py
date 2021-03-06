@@ -1,21 +1,23 @@
+import random
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-from django.forms import widgets
+# from django.forms import widgets
 from .models import User, Executive, Rider, Rides
-
-from crispy_forms.helper import FormHelper
+from phonenumber_field.formfields import PhoneNumberField
+# from crispy_forms.helper import FormHelper
 
 class RiderSignUpForm(UserCreationForm):
+    cell = PhoneNumberField()
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('name', 'username', 'password1', 'password2', 'cell')
 
     def __init__(self, *args, **kwargs):
         super(RiderSignUpForm, self).__init__(*args, **kwargs)
 
-        for fieldname in ['username', 'password1', 'password2']:
+        for fieldname in ['name','username', 'password1', 'password2']:
             self.fields[fieldname].help_text = None
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('name', 'username')
 
     @transaction.atomic
     def save(self):
@@ -26,21 +28,36 @@ class RiderSignUpForm(UserCreationForm):
         return user
 
 class ExecutiveSignUpForm(UserCreationForm):
-    
-    shift_options = (('Shift 1','08:00 - 17:00'),('Shift 2','16:00 - 01:00'),('Shift 0','00;00 - 09:00'))
+   
+    shift_options = (('M','08:00 - 17:00'),('E','16:00 - 01:00'),('N','00;00 - 09:00'))
     shift = forms.ChoiceField(choices=shift_options)
-
+    car = forms.CharField(min_length=5)
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('name', 'password1', 'password2', 'shift', 'cell')
+        fields = ('name', 'password1', 'password2', 'shift', 'cell', 'car')
        
+    def __init__(self, *args, **kwargs):
+        super(ExecutiveSignUpForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['name', 'password1', 'password2']:
+            self.fields[fieldname].help_text = None
+
+    def generate_digits(self, amount):
+        digits = ""
+        for _ in range(amount):
+            digits = digits + chr(random.randint(ord('0'), ord('0')+9))
+        return digits
+
     @transaction.atomic
     def save(self):
         data = self.cleaned_data
-        user = super().save(commit=False)
+        user = super().save(commit=False)        
+        user.username = "_".join(user.name.split().append(self.generate_digits(7)))
         user.is_executive = True
         ex = Executive.objects.create(user=user)
         ex.shift = data.get('shift')
+        
+        # ex.car = data.get('car')
         return user
 
 class BookRideViewForm(forms.ModelForm):
