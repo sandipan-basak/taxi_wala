@@ -11,7 +11,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView, 
 
 from ..decorators import executive_required
 from ..forms import ExecutiveSignUpForm
-from ..models import User, Rider, Rides, Executive
+from ..models import User, Rider, Ride, Executive
 
 class ExecSignUpView(CreateView):
     model = User
@@ -31,7 +31,7 @@ class ExecSignUpView(CreateView):
 
 @method_decorator([login_required, executive_required], name='dispatch')
 class Ride_Alert(ListView):
-    model = Rides
+    model = Ride
     context_object_name = 'alerts'
     template_name = 'rides/executive/rider_alerts.html'
 
@@ -56,3 +56,12 @@ class Ride_Alert(ListView):
 @method_decorator([login_required, executive_required], name='dispatch')
 class PaymentsView(DetailView):
     pass
+
+@method_decorator([login_required, executive_required], name='dispatch')
+class RideView(ListView):
+    model = Ride
+    
+    def get_queryset(self, **kwargs):
+        rider = self.request.user.rider
+        queryset = Ride.objects.filter(rider=rider)
+        return queryset

@@ -61,7 +61,7 @@ class Status(models.Model):
         html = '<span class="badge badge-primary" style="background-color: %s">%s</span>' % (color, name)
         return mark_safe(html)
 
-class Rides(models.Model):
+class Ride(models.Model):
     rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE)
     cab = models.ForeignKey(Cab, on_delete=models.CASCADE)
@@ -73,6 +73,3 @@ class Rides(models.Model):
     
     def __str__(self):
         return self.pk
-
-    class Meta:
-        verbose_name_plural = "Rides"

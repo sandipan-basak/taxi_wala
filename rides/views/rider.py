@@ -12,7 +12,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
-from ..models import Status, User, Rider, Rides, Executive
+from ..models import Status, User, Rider, Ride, Executive
 
 class RiderSignUpView(CreateView):
     model = User
@@ -31,7 +31,7 @@ class RiderSignUpView(CreateView):
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class BookRideView(CreateView):
-    model = Rides
+    model = Ride
 
     form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
@@ -43,9 +43,9 @@ class BookRideView(CreateView):
         # messages.success(self.request, 'The quiz was created with success! Go ahead and add some questions now.')
         return redirect('rider:status', ride.pk)
         
-
+@method_decorator([login_required, rider_required], name='dispatch')
 class RideStatusView(DetailView):
-    model = Rides
+    model = Ride
     context_object_name = 'ride'
     template_name = 'rides/rider/ride_status.html'
 
@@ -54,4 +54,12 @@ class RideStatusView(DetailView):
         kwargs['cabee'] = self.get_object().cabee
         return super().get_context_data(**kwargs)
 
-        
+@method_decorator([login_required, rider_required], name='dispatch')
+class RideView(ListView):
+    model = Ride
+    
+    def get_queryset(self, **kwargs):
+        rider = self.request.user.rider
+        queryset = Ride.objects.filter(rider=rider)
+        return queryset
+    
