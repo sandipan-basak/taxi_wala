@@ -1,14 +1,14 @@
 
 .searchbar{
-margin-bottom: auto;
-margin-top: auto;
+margin-bottom: 2px;
+margin-top: 2px;
 height: 60px;
 background-color: #353b48;
 border-radius: 30px;
 padding: 10px;
 }
 
-.search_input{
+/* .search_input{
 color: rgb(248, 248, 152);
 border: 0;
 outline: 0;
@@ -17,14 +17,17 @@ width: 0;
 caret-color:transparent;
 line-height: 40px;
 transition: width 0.4s linear;
-}
+} */
 
-.searchbar:hover > .search_input{
+.search_input{
 padding: 0 10px;
-width: 450px;
+width: 300px;
+border: none;
 caret-color:rgb(201, 245, 176);
+line-height: 40px;
 transition: width 0.4s linear;
 text-indent: 20px;
+background: none;
 background-image: url('../../images/map_view/black_map.png');
 background-repeat: no-repeat;
 background-size: 20px 20px;

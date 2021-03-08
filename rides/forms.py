@@ -22,6 +22,7 @@ class RiderSignUpForm(UserCreationForm):
     @transaction.atomic
     def save(self):
         user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
         user.is_rider = True
         user.save()
         Rider.objects.create(user=user)
@@ -51,9 +52,11 @@ class ExecutiveSignUpForm(UserCreationForm):
     @transaction.atomic
     def save(self):
         data = self.cleaned_data
-        user = super().save(commit=False)        
+        user = super().save(commit=False)
+        user.set_password(data.get('password1'))
         user.username = "_".join(user.name.split().append(self.generate_digits(7)))
         user.is_executive = True
+        
         ex = Executive.objects.create(user=user)
         ex.shift = data.get('shift')
         
