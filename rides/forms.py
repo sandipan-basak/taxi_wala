@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 # from django.forms import widgets
-from .models import User, Executive, Rider, Ride
+from .models import User, Executive, Rider, Ride, Place
 # from phonenumber_field.formfields import PhoneNumberField
 # from crispy_forms.helper import FormHelper
 
@@ -61,7 +61,13 @@ class ExecutiveSignUpForm(UserCreationForm):
         return user
 
 class BookRideViewForm(forms.ModelForm):
+    
+    source = forms.CharField(max_length=250)
+    destination = forms.CharField(max_length=250)
     class Meta:
-        model = Ride
+        model = Place
         fields = ('source','destination',)
+
+    
+
     

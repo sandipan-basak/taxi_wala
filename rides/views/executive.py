@@ -11,7 +11,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView, 
 
 from ..decorators import executive_required
 from ..forms import ExecutiveSignUpForm
-from ..models import User, Rider, Ride, Executive
+from ..models import User, Rider, Ride, Executive, Place
 
 class ExecSignUpView(CreateView):
     model = User
@@ -58,7 +58,7 @@ class PaymentsView(DetailView):
     pass
 
 @method_decorator([login_required, executive_required], name='dispatch')
-class RideView(ListView):
+class RidesView(ListView):
     model = Ride
     
     def get_queryset(self, **kwargs):

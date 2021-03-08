@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
+
 {% block content %}
 
+<link rel="stylesheet" href="{% static "css/map_view/get_ride.css" %}">
 <script src="{% static "js/map_view/search_bars.js" %}" alt="No script"></script>
 
 <div class="container">
@@ -10,25 +12,8 @@
     <h2>Welcome {{ user.username }}</h2>
   </div>
 
-
-  <div class="container px-4 my-4">
-    <div class="row gx-4">
-      <div class="col">
-        <div class="p-3 border">
-          <label for="pickup" class="form-label">Pickup</label>
-          <input type="search" class="form-control" id="pickup" placeholder="HSR Layout">
-        </div>
-      </div>
-      <div class="col">
-        <div class="p-3 border"
-        
-        >
-          <label for="drop-1" class="form-label">Drop</label>
-          <input type="text" class="form-control" id="drop-1" placeholder="Lido Mall"/>
-        </div>
-      </div>
-    </div>
-  </div>
+  
+  
   
   <div class="d-flex justify-content-center mx-2 px2">
     <div class="container my-2" style="width: 600px; height: 450px;" id="map"></div>
