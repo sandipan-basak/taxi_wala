@@ -1,9 +1,34 @@
 {
-    "user": [
+    "users": [
         {
-            "name":"test test",
-            "username":"test_test_12347623",
-            "pass":"qwert1238qwe"
+            "name": "Sherri Harrington",
+            "username": "Sherri_Harrington_4656911",
+            "pass": "pjdxfBxkrp"
+        },
+        {
+            "name": "Katherine Kelly",
+            "username": "Katherine_Kelly_9216992",
+            "pass": "GE2lD631Ft"
+        },
+        {
+            "name": "John Green",
+            "username": "John_Green_3087191",
+            "pass": "nIj4fFoO04"
+        },
+        {
+            "name": "Daniel Stanton",
+            "username": "Daniel_Stanton_3631392",
+            "pass": "tvJpDlPVqn"
+        },
+        {
+            "name": "Jeremy Harvey",
+            "username": "Jeremy_Harvey_7982946",
+            "pass": "7bhKRFamU9"
+        },
+        {
+            "name": "Amanda Allen",
+            "username": "Amanda_Allen_4525071",
+            "pass": "mVmqUIqOIR"
         }
     ]
 }

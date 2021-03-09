@@ -1,8 +1,9 @@
+import os
 import random
 import json
 from faker import Faker
 from django.core.management.base import BaseCommand
-from rides.models import Executive, Cab, User
+from rides.models import Executive, Cab, User, Rider
 from rides.utils.generator_util import GeneratorMod
 from rides.utils.license_plate import License
 
@@ -14,9 +15,7 @@ class Command(BaseCommand):
     gu = GeneratorMod()
 
     def populate_execs(self, n=2):
-
         for _ in range(n):
-
             shift = self.shift_options[random.randint(0, 2)]
             name = self.fakegen.name()
             pas_ = self.gu.get_random_string(10)
@@ -29,18 +28,31 @@ class Command(BaseCommand):
             Executive.objects.create(user=user, car=cab, shift=shift)
 
     def populate_rider(self, n=2):
-        file = open('user_pass.json', 'a+')
+        path = os.path.dirname(os.path.realpath(__file__)) + '/user_pass.json'
         
-        data = json.load(file)
+        json_file = open(path, 'a+')
+        filesize = os.path.getsize(path)
+        print('file size', filesize)
+        
+        if filesize == 0:
+            data = {}
+            data['users'] = []
+        else: 
+            json_file.seek(0)
+            data = json.load(json_file)
+            json_file.close()
+            json_file = open(path, 'w+')
+
         for _ in range(n):
             
             name = self.fakegen.name()
             pas_ = self.gu.get_random_string(10)
             uname = self.gu.generate_username(name)
             
-            user = User.objects.create(username=uname, name=name, password=pas_, is_ex=False, is_rider=True)
-            
-            data.append({
+            user = User.objects.create(name=name, username=uname, is_ex=False, is_rider=True)
+            user.set_password(pas_)
+            user.save()
+            data['users'].append({
                 "name": name,
                 "username": uname,
                 "pass": pas_
@@ -48,8 +60,11 @@ class Command(BaseCommand):
 
             Rider.objects.create(user=user)
 
-        json.dump(data, file)
-        file.close()
+        # print(json.dumps(data, indent=4))
+        # json_file.seek(0)
+        json.dump(data, json_file, indent=4)
+        # json_file.truncate()
+        json_file.close()
 
     def add_arguments(self, parser):
         parser.add_argument('limit', metavar='Limit', type=int, 
@@ -66,12 +81,7 @@ class Command(BaseCommand):
             )
     
     def handle(self, *args, **options):
-
-        with open('user_pass.json','a+') as file:
-            
-        print(file.read())
         if options['rider']:
-            print(int(options['limit']))
             self.populate_rider(options['limit'])
         else:
             self.populate_execs(options['limit'])
