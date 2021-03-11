@@ -1,3 +1,9 @@
 body,html{
-    background: none;
+    background: #F0E69D;
     }
+#main_content{
+    background-color: #EEAD83;
+}
+#body_content{
+    width: 100%;
+}
