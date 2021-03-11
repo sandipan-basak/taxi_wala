@@ -15,15 +15,18 @@
         <img src="{% static 'images/map_view/drop_marker.png' %}" alt="" id="drop_icon" style="display: none;">
         <div class="container my-5 h-100">
           <div class="searchbar">
-            <input class="search_input" id="pickup_loc" type="text" name="" placeholder="Pickup...">
+            <input class="search_input w-100" id="pickup_loc" type="text" name="" placeholder="Pickup...">
           </div>
         </div>
         <div class="container my-5 h-100">
           <div class="searchbar">
-            <input class="search_input" id="drop_loc" type="text" name="" placeholder="Drop...">
+            <input class="search_input w-100" id="drop_loc" type="text" name="" placeholder="Drop...">
           </div>
         </div>
-        <button type="Book" style="display: none;" class="btn btn-primary">Search Ride</button>
+        <div class="d-flex justify-content-center my-2">
+          <button type="submit" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
+          <button type="submit" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
+        </div>
       </form>
     </div>
     <div class="col-7" id="map_container">
