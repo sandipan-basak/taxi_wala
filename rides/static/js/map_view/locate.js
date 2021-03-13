@@ -4,6 +4,10 @@ function initMap() {
   const directionsRenderer = new google.maps.DirectionsRenderer({
     suppressMarkers: true
   });
+  // debugger;
+  const x_p = document.getElementById("close_pickup");
+  const x_d = document.getElementById("close_drop");
+
   const map_element = document.getElementById("map");
   const map = new google.maps.Map(map_element, {
       center: { lat: 20.5937, lng: 78.9629 },
@@ -14,8 +18,10 @@ function initMap() {
 
   const pl = document.getElementById('pickup_loc');
   const dl = document.getElementById('drop_loc');
+
   const pick_src = document.getElementById("pickup_icon").src;
   const drop_src = document.getElementById("drop_icon").src;
+
   const ac_p = new google.maps.places.Autocomplete(pl);
   // ac_p.bindTo("bounds", map);
   ac_p.setFields([
@@ -32,20 +38,16 @@ function initMap() {
     map,
     anchorPoint: new google.maps.Point(0,-29),
   });
-  // let loc;
-  // let bounds;
+
   ac_p.addListener("place_changed", () => {
+    ac_p.bindTo("bounds", map);
     marker_pickup.setVisible(false);
     const place = ac_p.getPlace();
-    // bounds = new google.maps.LatLngBounds();
-    // bounds.extend(place.latLng);
-    // loc = place;
     map_element.style.display = "block";
     if(!place.geometry || !place.geometry.location){
       window.alert("No details available for input: '" + place.name + "'");
       return;
     }
-    // debugger;
     console.log(pick_src);
     marker_pickup.setIcon(pick_src);
     if (place.geometry.viewport) {
@@ -54,9 +56,10 @@ function initMap() {
       map.setCenter(place.geometry.location);
       map.setZoom(17);
     }
-    // marker_pickup.setMap(map);
+
     marker_pickup.setPosition(place.geometry.location);
     marker_pickup.setVisible(true);
+    x_p.style.display = "block";
   });
 
   const ac_d = new google.maps.places.Autocomplete(dl);
@@ -68,25 +71,28 @@ function initMap() {
   ]);
 
   ac_d.addListener("place_changed", () => {
+    
     marker_drop.setVisible(false);
     const place = ac_d.getPlace();
     if(!place.geometry || !place.geometry.location){
       window.alert("No details available for input: '" + place.name + "'");
       return;
     }
-    // bounds = new google.maps.LatLngBounds();
     marker_drop.setIcon(drop_src);
-    // debugger;
-    // const bounds = loc.getBounds();
-    // bounds.extend(place.getBounds());
     calculateAndDisplayRoute(directionsService, directionsRenderer);
     marker_drop.setPosition(place.geometry.location);
     marker_drop.setVisible(true);
-    // map.fitBounds(bounds);
-    // bounds = new google.maps.LatLngBounds();
+    x_d.style.display = "block";
   });
-
 };
+
+function inputNotEmpty(){
+  const pl = document.getElementById('pickup_loc');
+  if (pl==""){
+    alert("input field empty");
+  }
+  return pl!="";
+}
 
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   directionsService.route(
@@ -108,6 +114,29 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
     }
   );
 }
+
+var x_p = document.getElementById("close_pickup");
+var x_d = document.getElementById("close_drop");
+x_p.addEventListener("click", function(){
+  document.getElementById("pickup_loc").value = "";
+  x_p.style.display = "none";
+});
+x_d.addEventListener("click", function(){
+  document.getElementById("drop_loc").value = "";
+  x_p.style.display = "none";
+});
+
+// function closeSearch(){
+//   const x_p = document.getElementById("close_pickup");
+//   const x_d = document.getElementById("close_drop");
+//   x_p.addEventListener("click", function(){
+//     debugger;
+//     document.getElementById("pickup_loc").value = "";
+//   });
+//   x_d.addEventListener("click", function(){
+//     document.getElementById("drop_loc").value = "";
+//   });
+// }
 
 
 // function handleLocationError(browserHasGeolocation, pos) {
