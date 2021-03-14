@@ -6,9 +6,9 @@ from rides.views import rides, executive, rider
 urlpatterns = [
     path('', include('rides.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/signup/', rides.SignUpView.as_view(), name='signup'),
-    path('accounts/signup/r/', rider.RiderSignUpView.as_view(), name='rider_signup'),
-    path('accounts/signup/e/', executive.ExecSignUpView.as_view(), name='executive_signup'),
+    path('accounts/signup/', rides.SignUp.as_view(), name='signup'),
+    path('accounts/signup/r/', rider.RiderSignUp.as_view(), name='rider_signup'),
+    path('accounts/signup/e/', executive.ExecSignUp.as_view(), name='executive_signup'),
     path('admin/', admin.site.urls),
     # path('accounts/signup/', ),
     # path('accounts/signup/rider', django.contrib.auth.urls),

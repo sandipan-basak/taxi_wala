@@ -10,6 +10,8 @@ class User(AbstractUser):
     name = models.CharField(max_length=100)
     cell = PhoneNumberField(blank=True)
     wallet = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
+    def __str__(self):
+        return self.username
 
 class Place(models.Model):
     pincode = models.CharField(max_length=10)
@@ -23,12 +25,14 @@ class Cab(models.Model):
     # executive = models.OneToOneField(Executive, on_delete=models.CASCADE, primary_key=True)
     # lat = models.DecimalField(max_digits=20, decimal_places=14)
     # lon = models.DecimalField(max_digits=20, decimal_places=14)
+    def __str__(self):
+        return self.number
 
 
 class Executive(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    car = models.OneToOneField(Cab, on_delete=models.CASCADE, null=True)
+    car = models.OneToOneField(Cab, on_delete=models.CASCADE, null=True, blank=False)
 
     
     shift = models.CharField(max_length=1)
@@ -40,11 +44,11 @@ class Executive(models.Model):
     def __str__(self):
         return self.user.username
 
-class Rider(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    # saved_add = models.ForeignKey(Place, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.user.username
+# class Rider(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+#     # saved_add = models.ForeignKey(Place, on_delete=models.CASCADE)
+#     def __str__(self):
+#         return self.user.username
 
 class Status(models.Model):
     name = models.CharField(max_length=30)
@@ -62,14 +66,15 @@ class Status(models.Model):
         return mark_safe(html)
 
 class Ride(models.Model):
-    rider = models.ForeignKey(Rider, on_delete=models.CASCADE)
-    cabee = models.ForeignKey(Executive, on_delete=models.CASCADE)
-    cab = models.ForeignKey(Cab, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now=True, auto_now_add=False)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    rider = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    cabee = models.ForeignKey(Executive, on_delete=models.CASCADE, null=True, blank=True)
+    cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateTimeField(auto_now=True, auto_now_add=False, null=True, blank=True)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
     charges = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
-    source = models.ForeignKey(Place, on_delete=models.CASCADE, default='', blank=True, related_name='source')
-    destination = models.ForeignKey(Place, on_delete=models.CASCADE, default='', blank=True, related_name='destination')
+    source = models.CharField(max_length=200, blank=False)
+    # destination = models.ForeignKey(Place, related_name='destination')
+    destination = models.CharField(max_length=200, blank=False)
     
     def __str__(self):
         return self.pk

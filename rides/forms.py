@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 # from django.forms import widgets
-from .models import User, Executive, Rider, Ride, Place
+from .models import User, Executive,  Ride, Place
 # from phonenumber_field.formfields import PhoneNumberField
 # from crispy_forms.helper import FormHelper
 
@@ -25,7 +25,7 @@ class RiderSignUpForm(UserCreationForm):
         user.set_password(self.cleaned_data["password1"])
         user.is_rider = True
         user.save()
-        Rider.objects.create(user=user)
+        # Rider.objects.create(user=user)
         return user
 
 class ExecutiveSignUpForm(UserCreationForm):

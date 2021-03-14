@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, reverse
 from django.views.generic import TemplateView
 
 
-class SignUpView(TemplateView):
+class SignUp(TemplateView):
     template_name = 'registration/signup.html'
 
 
