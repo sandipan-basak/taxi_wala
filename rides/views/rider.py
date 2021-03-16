@@ -32,7 +32,7 @@ class RiderSignUp(CreateView):
 @method_decorator([login_required, rider_required], name='dispatch')
 class SetLocation(CreateView):
     
-    # form_class = BookRideViewForm
+    form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
     success_url = reverse_lazy('rider:live')
     
@@ -41,16 +41,9 @@ class SetLocation(CreateView):
         # ride.status = Status.objects.get(name='On Queue')
         ride.save()
         # messages.success(self.request, 'ssup')
-        return render('rider:live', ride.pk)
+        return redirect('rider:live')
 
-# @method_decorator([login_required, rider_required], name='dispatch')        
-# class ConfirmCab(CreateView):
-#     model = Ride
-    
-#     def get_queryset(self, **kwargs):
-#         rider = self.request.user.rider
-#         queryset = Ride.objects.filter(rider=rider)
-        # return queryset
+
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class BookRide(TemplateView):
@@ -66,7 +59,6 @@ class RideStatus(DetailView):
         kwargs['rider'] = self.get_object().rider
         kwargs['cabee'] = self.get_object().cabee
         return super().get_context_data(**kwargs)
-
 
 
 @method_decorator([login_required, rider_required], name='dispatch')

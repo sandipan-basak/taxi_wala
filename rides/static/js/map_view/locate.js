@@ -60,6 +60,7 @@ function initMap() {
     marker_pickup.setPosition(place.geometry.location);
     marker_pickup.setVisible(true);
     x_p.style.display = "block";
+    document.getElementById('id_source').value = pl.value;
   });
 
   const ac_d = new google.maps.places.Autocomplete(dl);
@@ -83,6 +84,7 @@ function initMap() {
     marker_drop.setPosition(place.geometry.location);
     marker_drop.setVisible(true);
     x_d.style.display = "block";
+    document.getElementById('id_destination').value = dl.value;
   });
 };
 
@@ -125,6 +127,12 @@ x_d.addEventListener("click", function(){
   document.getElementById("drop_loc").value = "";
   x_p.style.display = "none";
 });
+
+// var h_s = document.getElementById('id_source')
+// var h_d = document.getElementById('id_destination')
+
+
+
 
 // function closeSearch(){
 //   const x_p = document.getElementById("close_pickup");

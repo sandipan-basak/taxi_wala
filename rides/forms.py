@@ -2,13 +2,13 @@ import random
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-# from django.forms import widgets
+from django.forms import widgets
 from .models import User, Executive,  Ride, Place
-# from phonenumber_field.formfields import PhoneNumberField
-# from crispy_forms.helper import FormHelper
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Row, Column, Field
 
 class RiderSignUpForm(UserCreationForm):
-    # cell = PhoneNumberField()
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('name', 'username', 'password1', 'password2', 'cell')
@@ -33,6 +33,7 @@ class ExecutiveSignUpForm(UserCreationForm):
     shift_options = (('M','08:00 - 17:00'),('E','16:00 - 01:00'),('N','00;00 - 09:00'))
     shift = forms.ChoiceField(choices=shift_options)
     car = forms.CharField(min_length=5)
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('name', 'password1', 'password2', 'shift', 'cell', 'car')
@@ -65,12 +66,37 @@ class ExecutiveSignUpForm(UserCreationForm):
 
 class BookRideViewForm(forms.ModelForm):
     
-    source = forms.CharField(max_length=250)
-    destination = forms.CharField(max_length=250)
+    # source = forms.CharField(max_length=250)
+    # destination = forms.CharField(max_length=250)
+
     class Meta:
-        model = Place
-        fields = ('source','destination',)
+        model = Ride
+        fields = ('source','destination')
 
-    
+        widgets = {
+            'source': forms.HiddenInput,
+            'destination': forms.HiddenInput
+        }
 
-    
+
+    def __init__(self, *args, **kwargs):
+        super(BookRideViewForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Field('source', css_id="pickup_loc", css_class="search_p w-100 col-11", type="text", placeholder="Pickup..."),
+            Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text", placeholder="Drop..."),
+        )
+
+    @transaction.atomic
+    def save(self):
+        data = self.cleaned_data
+        user = super().save(commit=False)
+        user.set_password(data.get('password1'))
+        user.username = "_".join(user.name.split().append(self.generate_digits(7)))
+        user.is_executive = True
+        
+        ex = Executive.objects.create(user=user)
+        ex.shift = data.get('shift')
+        
+        # ex.car = data.get('car')
+        return user
