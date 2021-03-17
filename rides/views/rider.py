@@ -32,22 +32,34 @@ class RiderSignUp(CreateView):
 @method_decorator([login_required, rider_required], name='dispatch')
 class SetLocation(CreateView):
     
+    model = Ride
     form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
-    success_url = reverse_lazy('rider:live')
+    # success_url = reverse_lazy('rider:live')
     
     def form_valid(self, form):
-        ride = form.save(commit = False)
-        # ride.status = Status.objects.get(name='On Queue')
+        # messages.success(self.request, 'Interests updated with success!')
+        ride = form.save(commit=False)
+        ride.rider = self.request.user
         ride.save()
-        # messages.success(self.request, 'ssup')
-        return redirect('rider:live')
-
-
+        # return super().form_valid(form)
+        return redirect('rider:live', ride.pk)
 
 @method_decorator([login_required, rider_required], name='dispatch')
-class BookRide(TemplateView):
-    pass
+class BookRide(DetailView):
+
+    model = Ride
+    template_name = 'rides/rider/check_ride.html'
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # ride = self.get_object()
+        # ex = ride.cabee 
+        rider = self.request.user
+        context['rider'] = rider
+        return context
+
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class RideStatus(DetailView):

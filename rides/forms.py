@@ -56,28 +56,22 @@ class ExecutiveSignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.set_password(data.get('password1'))
         user.username = "_".join(user.name.split().append(self.generate_digits(7)))
-        user.is_executive = True
+        user.is_ex = True
         
         ex = Executive.objects.create(user=user)
         ex.shift = data.get('shift')
-        
-        # ex.car = data.get('car')
         return user
 
 class BookRideViewForm(forms.ModelForm):
     
-    # source = forms.CharField(max_length=250)
-    # destination = forms.CharField(max_length=250)
-
     class Meta:
         model = Ride
-        fields = ('source','destination')
+        fields = ('source', 'destination')
 
         widgets = {
             'source': forms.HiddenInput,
             'destination': forms.HiddenInput
         }
-
 
     def __init__(self, *args, **kwargs):
         super(BookRideViewForm, self).__init__(*args, **kwargs)
@@ -86,17 +80,5 @@ class BookRideViewForm(forms.ModelForm):
             Field('source', css_id="pickup_loc", css_class="search_p w-100 col-11", type="text", placeholder="Pickup..."),
             Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text", placeholder="Drop..."),
         )
+    
 
-    @transaction.atomic
-    def save(self):
-        data = self.cleaned_data
-        user = super().save(commit=False)
-        user.set_password(data.get('password1'))
-        user.username = "_".join(user.name.split().append(self.generate_digits(7)))
-        user.is_executive = True
-        
-        ex = Executive.objects.create(user=user)
-        ex.shift = data.get('shift')
-        
-        # ex.car = data.get('car')
-        return user

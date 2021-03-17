@@ -77,4 +77,4 @@ class Ride(models.Model):
     destination = models.CharField(max_length=200, blank=False)
     
     def __str__(self):
-        return self.pk
+        return str(self.pk)

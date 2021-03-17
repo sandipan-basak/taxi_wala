@@ -5,8 +5,8 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/get_ride.css' %}">
   <div class="row">
     <div class="col-5">
-      <h3 class="d-flex justify-content-center">Where do you wanna go today..?</h3>
-      <form method="post" novalidate>
+      <h3 class="d-flex justify-content-center">SSUP</h3>
+      <!-- <form method="post" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
         {#{ form|crispy }#}
@@ -32,12 +32,13 @@
           <button type="submit" onclick="inputNotEmpty()" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
           <button type="submit" onclick="inputNotEmpty()" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
         </div>
-      </form>
+      </form> -->
     </div>
-    <div class="col-7" id="map_container">
+
+    <!-- <div class="col-7" id="map_container">
       <div class="container w-100 h-100" id="map"></div>
-    </div>
+    </div> -->
   </div>
-  <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script>
+  <!-- <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script> -->
 {% endblock %}
