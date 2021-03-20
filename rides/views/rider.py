@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView
 
-
+from ..utils.API.google_api_util import GoogleApiHandler
 from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
 from ..models import Status, User, Ride, Executive, Place
@@ -54,11 +54,16 @@ class BookRide(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # ride = self.get_object()
+        ride = self.get_object()
+        
         # ex = ride.cabee 
-        rider = self.request.user
-        context['rider'] = rider
+        context['rider'] = self.request.user
+        context['cab'] = ride.cab
+        context['cabee'] = ride.cabee
         return context
+
+    # def get_queryset(self):
+    #     self.get_object()
 
 
 @method_decorator([login_required, rider_required], name='dispatch')
@@ -69,7 +74,9 @@ class RideStatus(DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs['rider'] = self.get_object().rider
+        
         kwargs['cabee'] = self.get_object().cabee
+
         return super().get_context_data(**kwargs)
 
 
@@ -82,5 +89,7 @@ class PastRides(ListView):
         queryset = Ride.objects.filter(rider=rider)
         return queryset
 
-
+# @login_required
+# @rider_required
+# def update_ride(request, pk):
     
