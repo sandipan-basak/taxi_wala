@@ -5,45 +5,51 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/get_ride.css' %}">
   <div class="row">
     <div class="col-5">
-      {# if ride.  #}
-      <h3 class="d-flex justify-content-center"></h3>
-      <!-- <form method="post" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}">
-        {#{ form|crispy }#}
-        <img src="{% static 'images/map_view/pickup_marker.png' %}" alt="" id="pickup_icon" style="display: none;">
-        <img src="{% static 'images/map_view/drop_marker.jpg' %}" alt="" id="drop_icon" style="display: none;">
-        <div class="container my-5 h-100">
-          <div class="searchbar">
-            <div class="row">
-              <input class="search_p w-100 col-11" id="pickup_loc" type="text" name="" placeholder="Pickup...">
-              <span class="close_search p-2 col-1" id="close_pickup" style="display: none;">&times;</span>
-            </div>            
-          </div>
-        </div>
-        <div class="container my-5 h-100">
-          <div class="searchbar">
-            <div class="row">
-              <input class="search_d w-100 col-11" id="drop_loc" type="text" name="" placeholder="Drop...">
-              <span class="close_search p-2 col-1" id="close_drop" style="display: none;">&times;</span>
-            </div>            
-          </div>
-        </div>
-        <div class="d-flex justify-content-center my-2">
-          <button type="submit" onclick="inputNotEmpty()" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
-          <button type="submit" onclick="inputNotEmpty()" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
-        </div>
-      </form> -->
-      
+      <!-- <h2 class="container">Loading...</h2> -->
+      <div class="container">
+        <p class="h5">Distnace: {{ride.travelled}} kms</p>
+        <p class="h5">Estimated fare: Rs.{{ride.charges}}</p>
+        {% if not ride.cabee %}
+          <p class="h5">Looking for nearby cars...!!</p>
+        {% else %}
+        <p class="h5">Driving Partner: {{ ride.cabee }}</p>
+        <p class="h5">Car for the ride: {{ ride.cab }}</p>
+        {% endif %}
+      </div>
     </div>
-    
-
-    
-
     <!-- <div class="col-7" id="map_container">
       <div class="container w-100 h-100" id="map"></div>
     </div> -->
   </div>
+  <script>
+    document.onmouseover = function() {
+    //User's mouse is inside the page.
+      window.innerDocClick = true;
+    }
+    document.onmouseleave = function() {
+    //User's mouse has left the page.
+      window.innerDocClick = false;
+    }
+    window.onhashchange = function() {
+      if (window.innerDocClick) {
+        //Your own in-page mechanism triggered the hash change
+        window.innerDocClick = false;
+      } else {
+        //Browser back button was clicked
+        window.location.href = "{% url 'rider:book' %}";
+      }
+    }
+    $(function(){
+      var rx = /INPUT|SELECT|TEXTAREA/i;
+      $(document).bind("keydown keypress", function(e){
+        if( e.which == 8 ){ // 8 == backspace
+          if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+            e.preventDefault();
+          }
+        }
+      });
+    });
+  </script>
   <!-- <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script> -->
 {% endblock %}

@@ -9,10 +9,9 @@ urlpatterns = [
         path('', rider.SetLocation.as_view(), name='book'),
         path('live/<int:pk>', rider.BookRide.as_view(), name='live'),
         # path('/results/', teachers.QuizResultsView.as_view(), name='quiz_results'),
-        path('status/', rider.RideStatus.as_view(), name='status'),
+        path('status/', rider.RideView.as_view(), name='status'),
         path('rides/', rider.PastRides.as_view(), name='history'),
     ], 'rides'), namespace='rider')),
-
     path('e/', include(([
         path('live/', executive.RideAlert.as_view(), name='alerts'),
         path('payments/', executive.Payments.as_view(), name='payments'),

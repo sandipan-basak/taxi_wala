@@ -22,18 +22,18 @@ class Place(models.Model):
 
 class Cab(models.Model):
     number = models.CharField(max_length=20, unique=True)
+    lat = models.DecimalField(max_digits=20, decimal_places=14)
+    lon = models.DecimalField(max_digits=20, decimal_places=14)
+    
     # executive = models.OneToOneField(Executive, on_delete=models.CASCADE, primary_key=True)
     # lat = models.DecimalField(max_digits=20, decimal_places=14)
     # lon = models.DecimalField(max_digits=20, decimal_places=14)
     def __str__(self):
         return self.number
 
-
 class Executive(models.Model):
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     car = models.OneToOneField(Cab, on_delete=models.CASCADE, null=True, blank=False)
-
     
     shift = models.CharField(max_length=1)
 
@@ -44,16 +44,9 @@ class Executive(models.Model):
     def __str__(self):
         return self.user.username
 
-# class Rider(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-#     # saved_add = models.ForeignKey(Place, on_delete=models.CASCADE)
-#     def __str__(self):
-#         return self.user.username
-
 class Status(models.Model):
     name = models.CharField(max_length=30)
     color = models.CharField(max_length=7, default='#007bff')
-
     def __str__(self):
         return self.name
     class Meta:
@@ -69,11 +62,11 @@ class Ride(models.Model):
     rider = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE, null=True, blank=True)
     cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateTimeField(auto_now=True, auto_now_add=False, null=True, blank=True)
+    date = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
+    travelled = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     charges = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     source = models.CharField(max_length=200, blank=False)
-    # destination = models.ForeignKey(Place, related_name='destination')
     destination = models.CharField(max_length=200, blank=False)
     
     def __str__(self):

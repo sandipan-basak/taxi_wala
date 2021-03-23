@@ -61,7 +61,15 @@ function initMap() {
     marker_pickup.setVisible(true);
     x_p.style.display = "block";
     document.getElementById('id_source').value = pl.value;
+    // var input = document.getElementById('inputId');
+    
   });
+  google.maps.event.addDomListener(pl, 'keydown', function(event) { 
+    if (event.keyCode === 13) { 
+        event.preventDefault(); 
+    }
+  });
+  
 
   const ac_d = new google.maps.places.Autocomplete(dl);
   ac_d.setFields([
@@ -85,6 +93,12 @@ function initMap() {
     marker_drop.setVisible(true);
     x_d.style.display = "block";
     document.getElementById('id_destination').value = dl.value;
+  });
+
+  google.maps.event.addDomListener(dl, 'keydown', function(event) { 
+    if (event.keyCode === 13) { 
+        event.preventDefault(); 
+    }
   });
 };
 

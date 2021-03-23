@@ -23,7 +23,6 @@ class ExecSignUp(CreateView):
         context['user_type'] = 'executive'
         return context
 
-
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
@@ -33,8 +32,16 @@ class ExecSignUp(CreateView):
 class RideAlert(ListView):
     model = Ride
     context_object_name = 'alerts'
-    template_name = 'rides/executive/rider_alerts.html'
+    template_name = 'rides/executive/rider_alerts.html'4
 
+    def get_queryset(self):
+        
+        partner = self.request.user
+        rides = 
+        current_ride = Ride.objects.exclude(cabee=partner)
+        if not ride:
+
+        context[""]
 
     pass
 
