@@ -13,34 +13,29 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-class Place(models.Model):
-    pincode = models.CharField(max_length=10)
-    state = models.CharField(max_length=120)
-    city = models.CharField(max_length=120)
-    country = models.CharField(max_length=120)
-    address = models.CharField(max_length=200)
+# class Place(models.Model):
+#     pincode = models.CharField(max_length=10)
+#     state = models.CharField(max_length=120)
+#     city = models.CharField(max_length=120)
+#     country = models.CharField(max_length=120)
+#     address = models.CharField(max_length=200)
 
 class Cab(models.Model):
     number = models.CharField(max_length=20, unique=True)
     lat = models.DecimalField(max_digits=20, decimal_places=14)
-    lon = models.DecimalField(max_digits=20, decimal_places=14)
+    lng = models.DecimalField(max_digits=20, decimal_places=14)
+    curr_save_time = models.DateTimeField(auto_now_add=False, auto_now=True)
+    class Meta():
+        ordering = ['number']
     
-    # executive = models.OneToOneField(Executive, on_delete=models.CASCADE, primary_key=True)
-    # lat = models.DecimalField(max_digits=20, decimal_places=14)
-    # lon = models.DecimalField(max_digits=20, decimal_places=14)
     def __str__(self):
         return self.number
 
 class Executive(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     car = models.OneToOneField(Cab, on_delete=models.CASCADE, null=True, blank=False)
-    
     shift = models.CharField(max_length=1)
-
     avg_r = models.DecimalField(max_digits=2, decimal_places=1, default=4.0)
-    # cell = PhoneField(blank=True, help_text='Contact phone number')
-    # amount = models.DecimalField(max_digits=11, decimal_places=2)    
-
     def __str__(self):
         return self.user.username
 
@@ -62,7 +57,8 @@ class Ride(models.Model):
     rider = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE, null=True, blank=True)
     cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateTimeField(auto_now=False, auto_now_add=True, null=True, blank=True)
+    date = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True, auto_now_add=False)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
     travelled = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     charges = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)

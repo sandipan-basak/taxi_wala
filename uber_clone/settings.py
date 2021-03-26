@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'phonenumber_field',
+    'background_task',
 ]
 
 MIDDLEWARE = [

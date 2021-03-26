@@ -7,9 +7,10 @@ from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
+from background_task import background
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView
 
-from rides.utils.API.google_api_util import GoogleApiHandler
+from rides.utils.API.google_api_util.API import GoogleApiHandler
 from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
 from ..models import Status, User, Ride, Executive, Place
@@ -36,12 +37,27 @@ class SetLocation(CreateView):
     template_name = 'rides/rider/get_ride.html'
     # success_url = reverse_lazy('rider:live')
 
+    gAPI = GoogleApiHandler()
+    
+    @background(schedule=40)
+    def create_car_posititons(self, source, ride):
+        # lookup user by id and send them a message
+        coor = self.gAPI.get_coor(source, ride)
+        random_loc = self.gAPI.random_points(2.0, coor)
+        curr_cab = Cab.objects.get()
+        cab = Cab
+        ride.save()
+            print (ride.)
+        return 
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         status_oq = Status.objects.get(name="On Queue").ride_set.all()
         status_og = Status.objects.get(name="Ongoing").ride_set.all()
         onqueue_ride = status_oq.filter(rider=self.request.user).first()
         ongoing_ride = status_og.filter(rider=self.request.user).first()
+        hello()
         print(onqueue_ride)
         print(ongoing_ride)
         if not onqueue_ride and not ongoing_ride:

@@ -62,8 +62,8 @@ function initMap() {
     x_p.style.display = "block";
     document.getElementById('id_source').value = pl.value;
     // var input = document.getElementById('inputId');
-    
   });
+  
   google.maps.event.addDomListener(pl, 'keydown', function(event) { 
     if (event.keyCode === 13) { 
         event.preventDefault(); 
