@@ -39,16 +39,7 @@ class SetLocation(CreateView):
 
     gAPI = GoogleApiHandler()
     
-    @background(schedule=40)
-    def create_car_posititons(self, source, ride):
-        # lookup user by id and send them a message
-        coor = self.gAPI.get_coor(source, ride)
-        random_loc = self.gAPI.random_points(2.0, coor)
-        curr_cab = Cab.objects.get()
-        cab = Cab
-        ride.save()
-            print (ride.)
-        return 
+
 
 
     def get_context_data(self, **kwargs):
@@ -57,7 +48,6 @@ class SetLocation(CreateView):
         status_og = Status.objects.get(name="Ongoing").ride_set.all()
         onqueue_ride = status_oq.filter(rider=self.request.user).first()
         ongoing_ride = status_og.filter(rider=self.request.user).first()
-        hello()
         print(onqueue_ride)
         print(ongoing_ride)
         if not onqueue_ride and not ongoing_ride:
@@ -90,6 +80,17 @@ class BookRide(DetailView):
 
     gAPI = GoogleApiHandler()
 
+    @background(schedule=40)
+    def create_car_posititons(self, source):
+        # lookup user by id and send them a message
+        coor = self.gAPI.get_coor(source)
+        random_loc = self.gAPI.random_points(2.0, coor)
+        curr_cab = Cab.objects.get()
+        cab = Cab
+        ride.save()
+            print (ride.)
+        return 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ride = self.get_object()
@@ -98,14 +99,13 @@ class BookRide(DetailView):
         total_duration = data['rows'][0]['elements'][0]['duration']['value']
         ride.charges = self.gAPI.calculate_cost(ride.travelled, total_duration)
         ride.save()
+        get_coor = 
+        create_car_posititons(ride.source, ride)
+        # first_cab = 
         context['rider'] = ride.rider
         context['cab'] = ride.cab
         context['cabee'] = ride.cabee
         return context
-
-    # def get_queryset(self):
-    #     status = Status.rider__set
-    #     return Book.objects.filter(publisher=self.publisher)
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class RideView(DetailView):

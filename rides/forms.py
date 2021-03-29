@@ -81,4 +81,11 @@ class BookRideViewForm(forms.ModelForm):
             Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text", placeholder="Drop..."),
         )
     
+    # def save(self):
+    #     data = self.cleaned_data
+    #     ride = super().save(commit=False)
+    #     ride.
+
+
+    
 
