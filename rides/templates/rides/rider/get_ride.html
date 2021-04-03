@@ -31,11 +31,11 @@
           </div>
         </div>
         <div id="sr_btn" class="d-flex justify-content-center my-2">
-            <button type="submit" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
-            <button type="submit" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
+          <button type="submit" id="search_now" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
+          <button type="submit" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
         </div>
         <div class="row">
-          <button type="button" style="display: none;" id="ongoing_btn" class="btn btn-info btn-sm mx-2">Search Ride</button>
+          <button type="button" style="display: none;" id="ongoing_btn" class="btn btn-info btn-sm mx-2">Ride Page</button>
         </div>
         <div>
           {{ form | crispy }}
@@ -59,6 +59,8 @@
       // debugger;
       // console.log(r_pk);
     }
+
+
   </script>
   <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script>

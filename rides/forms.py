@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.forms import widgets
-from .models import User, Executive,  Ride, Place
+from .models import User, Executive, Ride, Cab
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Field
 
@@ -11,14 +11,14 @@ class RiderSignUpForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('name', 'username', 'password1', 'password2', 'cell')
+        fields = ('name', 'username', 'password1', 'cell')
 
     def __init__(self, *args, **kwargs):
         super(RiderSignUpForm, self).__init__(*args, **kwargs)
-
-        for fieldname in ['name','username', 'password1', 'password2']:
+        self.fields.pop('password2')
+        for fieldname in ['name', 'username', 'password1']:
             self.fields[fieldname].help_text = None
-
+            
     @transaction.atomic
     def save(self):
         user = super().save(commit=False)
@@ -29,19 +29,21 @@ class RiderSignUpForm(UserCreationForm):
         return user
 
 class ExecutiveSignUpForm(UserCreationForm):
-   
-    shift_options = (('M','08:00 - 17:00'),('E','16:00 - 01:00'),('N','00;00 - 09:00'))
+
+    shift_options = (('M', '08:00 - 17:00'),
+                    ('E', '16:00 - 01:00'),
+                    ('N', '00;00 - 09:00'))
     shift = forms.ChoiceField(choices=shift_options)
     car = forms.CharField(min_length=5)
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('name', 'password1', 'password2', 'shift', 'cell', 'car')
-       
+        fields = ('name', 'password1', 'shift', 'cell', 'car')
+
     def __init__(self, *args, **kwargs):
         super(ExecutiveSignUpForm, self).__init__(*args, **kwargs)
-
-        for fieldname in ['name', 'password1', 'password2']:
+        self.fields.pop('password2')
+        for fieldname in ['name', 'password1']:
             self.fields[fieldname].help_text = None
 
     def generate_digits(self, amount):
@@ -55,11 +57,14 @@ class ExecutiveSignUpForm(UserCreationForm):
         data = self.cleaned_data
         user = super().save(commit=False)
         user.set_password(data.get('password1'))
-        user.username = "_".join(user.name.split().append(self.generate_digits(7)))
+        user.username = "_".join(user.name.split() + [self.generate_digits(7)])
         user.is_ex = True
-        
+        user.save()
         ex = Executive.objects.create(user=user)
         ex.shift = data.get('shift')
+        cab = Cab.objects.create(number = data.get('car'))
+        ex.car = cab
+        ex.save()
         return user
 
 class BookRideViewForm(forms.ModelForm):
@@ -70,22 +75,15 @@ class BookRideViewForm(forms.ModelForm):
 
         widgets = {
             'source': forms.HiddenInput,
-            'destination': forms.HiddenInput
+            'destination': forms.HiddenInput,
+            # 'date_time': forms.HiddenInput
         }
 
     def __init__(self, *args, **kwargs):
         super(BookRideViewForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            Field('source', css_id="pickup_loc", css_class="search_p w-100 col-11", type="text", placeholder="Pickup..."),
-            Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text", placeholder="Drop..."),
+            Field('source', css_id="pickup_loc", css_class="search_p w-100 col-11", type="text"),
+            Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text"),
+            # Field('date_time', css_class="container", css_id="get_date", type="text"),
         )
-    
-    # def save(self):
-    #     data = self.cleaned_data
-    #     ride = super().save(commit=False)
-    #     ride.
-
-
-    
-

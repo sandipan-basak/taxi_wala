@@ -1,7 +1,6 @@
 import random
 import math
 import requests
-import s2sphere as s2
 from urllib.parse import urlencode
 
 class Location_Generator():
@@ -12,10 +11,6 @@ class Location_Generator():
         u = random.random() + random.random()
         r = radius * (2 - u if u > 1 else u)
         return r
-
-    def get_s2_cell(self, latlng):
-        cell = s2.Cell.from_lat_lng(s2.LatLng(latlng[0], latlng[1]))
-        return cell.id
 
     def get_coor(self, loc):
         dis_ep = "https://maps.googleapis.com/maps/api/geocode/json"

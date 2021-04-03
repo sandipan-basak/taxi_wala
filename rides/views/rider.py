@@ -1,3 +1,5 @@
+from  datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -10,10 +12,11 @@ from django.utils.decorators import method_decorator
 from background_task import background
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView
 
-from rides.utils.API.google_api_util.API import GoogleApiHandler
+from rides.utils.google_api_util import GoogleApiHandler
 from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
-from ..models import Status, User, Ride, Executive, Place
+from ..models import Status, User, Ride, Executive
+
 
 class RiderSignUp(CreateView):
     model = User
@@ -30,17 +33,18 @@ class RiderSignUp(CreateView):
         login(self.request, user)
         return redirect('rider:book')
 
+
+@background(schedule=40)
+def create_car_posititons(self, source):
+    pass
+
 @method_decorator([login_required, rider_required], name='dispatch')
 class SetLocation(CreateView):
     model = Ride
     form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
-    # success_url = reverse_lazy('rider:live')
 
     gAPI = GoogleApiHandler()
-    
-
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,18 +63,48 @@ class SetLocation(CreateView):
         else:
             context["ride_flag"] = 2
             context["r_pk"] = ongoing_ride.pk
-
         print(context["ride_flag"])
         print(context["r_pk"])
         return context
     
+    def give_active_shifts(self, time):
+        UTC_m_time = datetime.strptime("02:30:00", "%H:%M:%S")
+        UTC_me_time = datetime.strptime("11:30:00", "%H:%M:%S")
+        UTC_e_time = datetime.strptime("10:30:00", "%H:%M:%S")
+        UTC_ee_time = datetime.strptime("19:30:00", "%H:%M:%S")
+        UTC_n_time = datetime.strptime("18:30:00", "%H:%M:%S")
+        UTC_ne_time = datetime.strptime("03:30:00", "%H:%M:%S")
+        
+        ''' 
+        1 m 4 me 7men
+        2 e 5 en
+        3 n 6 nm
+        '''
+        if UTC_m_time < time < UTC_me_time:
+            status = "m"
+        if UTC_e_time < time < UTC_ee_time:
+            status = "e" if not status else status+"e"
+
+        if UTC_n_time < time < UTC_ne_time:
+            status = "n" if not status else status+"e"
+        return status
+        
     def form_valid(self, form):
-        # messages.success(self.request, 'Interests updated with success!')
         ride = form.save(commit=False)
         ride_status = Status.objects.get(name="On Queue")
         ride.status = ride_status
         ride.rider = self.request.user
+        
+        data = self.gAPI.calculate_distance(orig=ride.source, dest=ride.destination)
+        ride.travelled = int(data['rows'][0]['elements'][0]['distance']['value'])/1000
+        total_duration = data['rows'][0]['elements'][0]['duration']['value']
+        ride.charges = self.gAPI.calculate_cost(ride.travelled, total_duration)
         ride.save()
+
+        # Initiate randome location creation
+
+        # create_car_posititons(ride.source, Executive.objects.filter(e.date_time))
+
         return redirect('rider:live', ride.pk)
 
 @method_decorator([login_required, rider_required], name='dispatch')
@@ -80,28 +114,20 @@ class BookRide(DetailView):
 
     gAPI = GoogleApiHandler()
 
-    @background(schedule=40)
-    def create_car_posititons(self, source):
-        # lookup user by id and send them a message
-        coor = self.gAPI.get_coor(source)
-        random_loc = self.gAPI.random_points(2.0, coor)
-        curr_cab = Cab.objects.get()
-        cab = Cab
-        ride.save()
-            print (ride.)
-        return 
+    # @background(schedule=40)
+    # def create_car_posititons(self, source):
+    #     # lookup user by id and send them a message
+    #     coor = self.gAPI.get_coor(source)
+    #     random_loc = self.gAPI.random_points(2.0, coor)
+    #     curr_cab = Cab.objects.get()
+    #     cab = Cab
+    #     ride.save()
+    #         print (ride.)
+    #     return 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ride = self.get_object()
-        data = self.gAPI.calculate_distance(orig=ride.source, dest=ride.destination)
-        ride.travelled = int(data['rows'][0]['elements'][0]['distance']['value'])/1000
-        total_duration = data['rows'][0]['elements'][0]['duration']['value']
-        ride.charges = self.gAPI.calculate_cost(ride.travelled, total_duration)
-        ride.save()
-        get_coor = 
-        create_car_posititons(ride.source, ride)
-        # first_cab = 
         context['rider'] = ride.rider
         context['cab'] = ride.cab
         context['cabee'] = ride.cabee

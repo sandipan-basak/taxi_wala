@@ -11,7 +11,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView, 
 
 from ..decorators import executive_required
 from ..forms import ExecutiveSignUpForm
-from ..models import User, Ride, Executive, Place, Status
+from ..models import User, Ride, Executive, Status
 
 class ExecSignUp(CreateView):
     model = User
@@ -36,7 +36,7 @@ class RideAlert(ListView):
     
     def get_queryset(self):
         partner = self.request.user
-        rides = Ride.objects.filter(status=Status.objects,get(name="On Queue"))    
+        rides = Ride.objects.filter(status=Status.objects.get(name="On Queue"))    
         
         # context[""]
         # return queryset

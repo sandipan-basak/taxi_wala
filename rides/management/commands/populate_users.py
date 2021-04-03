@@ -9,7 +9,7 @@ from rides.utils.license_plate import License
 
 class Command(BaseCommand):
 
-    shift_options = (('M','08:00 - 17:00'),('E','16:00 - 01:00'),('N','00;00 - 09:00'))
+    shift_options = ['M', 'E', 'N']
     fakegen = Faker()
     lic = License() 
     gu = GeneratorMod()
@@ -36,7 +36,7 @@ class Command(BaseCommand):
     def populate_execs(self, n=2):
         data = []
         for _ in range(n):
-            shift = self.shift_options[random.randint(0, 2)]
+            shift = random.choice(self.shift_options)
             name = self.fakegen.name()
             pas_ = self.gu.get_random_string(10)
             uname = self.gu.generate_username(name)

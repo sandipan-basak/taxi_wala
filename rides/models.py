@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.utils.html import escape, mark_safe
 from phonenumber_field.modelfields import PhoneNumberField
@@ -22,8 +23,8 @@ class User(AbstractUser):
 
 class Cab(models.Model):
     number = models.CharField(max_length=20, unique=True)
-    lat = models.DecimalField(max_digits=20, decimal_places=14)
-    lng = models.DecimalField(max_digits=20, decimal_places=14)
+    lat = models.DecimalField(max_digits=20, decimal_places=14, default=0.0)
+    lng = models.DecimalField(max_digits=20, decimal_places=14, default=0.0)
     curr_save_time = models.DateTimeField(auto_now_add=False, auto_now=True)
     class Meta():
         ordering = ['number']
@@ -36,6 +37,7 @@ class Executive(models.Model):
     car = models.OneToOneField(Cab, on_delete=models.CASCADE, null=True, blank=False)
     shift = models.CharField(max_length=1)
     avg_r = models.DecimalField(max_digits=2, decimal_places=1, default=4.0)
+    reg_city = models.CharField(max_length=200)
     def __str__(self):
         return self.user.username
 
@@ -57,7 +59,7 @@ class Ride(models.Model):
     rider = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE, null=True, blank=True)
     cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateTimeField(auto_now=False, auto_now_add=True)
+    date_time = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True, auto_now_add=False)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
     travelled = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
