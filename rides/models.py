@@ -38,6 +38,7 @@ class Executive(models.Model):
     shift = models.CharField(max_length=1)
     avg_r = models.DecimalField(max_digits=2, decimal_places=1, default=4.0)
     reg_city = models.CharField(max_length=200)
+    is_engaged = models.BooleanField(default=False)
     def __str__(self):
         return self.user.username
 

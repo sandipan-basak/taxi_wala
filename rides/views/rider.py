@@ -1,5 +1,5 @@
+import time
 from  datetime import datetime
-
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -9,19 +9,26 @@ from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 from background_task import background
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView
 
 from rides.utils.google_api_util import GoogleApiHandler
+from rides.utils.random_locations import Location_Generator
+from rides.utils.s2_get_cap import GetCap
 from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
-from ..models import Status, User, Ride, Executive
+from ..models import Status, User, Ride, Executive, Cab
 
 
 class RiderSignUp(CreateView):
     model = User
     form_class = RiderSignUpForm
     template_name = 'registration/signup_form.html'
+
+    gAPI = GoogleApiHandler()
+    cap = GetCap()
+    gL = Location_Generator()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,11 +39,6 @@ class RiderSignUp(CreateView):
         user = form.save()
         login(self.request, user)
         return redirect('rider:book')
-
-
-@background(schedule=40)
-def create_car_posititons(self, source):
-    pass
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class SetLocation(CreateView):
@@ -74,19 +76,12 @@ class SetLocation(CreateView):
         UTC_ee_time = datetime.strptime("19:30:00", "%H:%M:%S")
         UTC_n_time = datetime.strptime("18:30:00", "%H:%M:%S")
         UTC_ne_time = datetime.strptime("03:30:00", "%H:%M:%S")
-        
-        ''' 
-        1 m 4 me 7men
-        2 e 5 en
-        3 n 6 nm
-        '''
         if UTC_m_time < time < UTC_me_time:
-            status = "m"
+            status = "M"
         if UTC_e_time < time < UTC_ee_time:
-            status = "e" if not status else status+"e"
-
+            status = "E" if not status else status+"E"
         if UTC_n_time < time < UTC_ne_time:
-            status = "n" if not status else status+"e"
+            status = "N" if not status else status+"N"
         return status
         
     def form_valid(self, form):
@@ -100,30 +95,55 @@ class SetLocation(CreateView):
         total_duration = data['rows'][0]['elements'][0]['duration']['value']
         ride.charges = self.gAPI.calculate_cost(ride.travelled, total_duration)
         ride.save()
+        partners = Executive.objects.filter(is_engaged=False)
+        for x in self.give_active_shifts(ride.date_time):
+            queryset = partners.filter(shift=x)
+            if not cabees:
+                cabees = queryset
+            else:
+                cabees.union(queryset)
+        # Create random cab locations in the city
+        for cabee in cabees:
+            random_loc = gL.random_points(10, gL.get_coor(ride.source))
+            cabee.car.lat = random_loc[0]
+            cabee.car.lng = random_loc[1]
+            cabee.car.save()
 
-        # Initiate randome location creation
-
-        # create_car_posititons(ride.source, Executive.objects.filter(e.date_time))
-
+        get_cabs(ride, cabee_list, 200, schedule=timezone.now())
         return redirect('rider:live', ride.pk)
+
+
+@background
+def get_cabs(self, ride, cabees, radius):
+    cap = GetCap()
+    while(True):
+        region = cap.find_cover(radius, ride.source)
+        close_by_cabs = []
+        for cabee in cabees:
+            if cap.contains([cabee.car.lat, cabee.car.lng], region):
+                close_by_cabees.append(cabee)
+        for cabee in close_by_cabees:
+            ride.cab = cabee.cab
+            ride.cabee = cabee
+            ride.save()
+            cabee.is_engaged = True
+            old.is_engaged = False
+            old.save()
+            print(ride.cabee.user.name)
+            time.sleep(60)
+            old = cabee
+
+        radius = radius + 100
+
+        if radius > 4500:
+            break
+    
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class BookRide(DetailView):
     model = Ride
     template_name = 'rides/rider/check_ride.html'
-
     gAPI = GoogleApiHandler()
-
-    # @background(schedule=40)
-    # def create_car_posititons(self, source):
-    #     # lookup user by id and send them a message
-    #     coor = self.gAPI.get_coor(source)
-    #     random_loc = self.gAPI.random_points(2.0, coor)
-    #     curr_cab = Cab.objects.get()
-    #     cab = Cab
-    #     ride.save()
-    #         print (ride.)
-    #     return 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
