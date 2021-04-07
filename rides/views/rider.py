@@ -8,6 +8,7 @@ from django.db.models import Avg, Count
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from background_task import background
@@ -112,6 +113,19 @@ class SetLocation(CreateView):
         get_cabs(ride, cabee_list, 200, schedule=timezone.now())
         return redirect('rider:live', ride.pk)
 
+        # Initiate randome location creation
+        status_string = self.give_active_shifts(ride.date_time)
+        for i in st:
+            if not cabees:
+                cabees = Executive.objects.filter(shift=i)
+            else:
+                cabees.union(Executive.objects.filter(shift=i))
+        cabees = cabees.filter(is_engaged=False)
+        
+        random_locations(ride, 6000, status_string, cabees, schedule=timezone.now())
+        get_close_cabs(ride, cabees, schedule=timezone.now())
+
+        # create_car_posititons(ride.source, Executive.objects.filter(e.date_time))
 
 @background
 def get_cabs(self, ride, cabees, radius):
@@ -136,6 +150,40 @@ def get_cabs(self, ride, cabees, radius):
         radius = radius + 100
 
         if radius > 4500:
+            break
+    
+
+@background
+def random_locations(ride, radius, st, cabees):
+    g_l = Location_Generator()
+    for i in st:
+        if not cabees:
+            cabees = Executive.objects.filter(shift=i)
+        else:
+            cabees.union(Executive.objects.filter(shift=i))
+    cabees = cabees.filter(is_engaged=False)
+    
+    for cabee in cabees:
+        curr_loc = g_l.random_points(radius, g_l.get_coor(ride.source))
+        cabee.car.lat = curr_loc[0]
+        cabee.car.lng = curr_loc[1]
+        cabee.car.save() 
+
+@background
+def get_close_cabs(ride, cabees):
+    s2_cap = GetCap()
+    rad = 150
+    while True:
+        s2_cap.find_cover(150, Location_Generator.get_coor(ride.source))
+
+        for cabee in cabees:
+            if s2_cap.contains([cabee.car.lat, cabee.car.lng]):
+                ride.cabee = cabee
+                ride.status = Status(name="Ongoing")
+                
+
+        rad = rad + 100    
+        if rad > 4000:
             break
     
 
