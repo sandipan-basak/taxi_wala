@@ -59,7 +59,7 @@ class Status(models.Model):
 class Ride(models.Model):
     rider = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cabee = models.ForeignKey(Executive, on_delete=models.CASCADE, null=True, blank=True)
-    # cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
+    cab = models.ForeignKey(Cab, on_delete=models.CASCADE, null=True, blank=True)
     date_time = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True, auto_now_add=False)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)

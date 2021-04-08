@@ -29,15 +29,15 @@ class ExecSignUp(CreateView):
         return redirect('rider:book')
 
 @method_decorator([login_required, executive_required], name='dispatch')
-class RideAlert(DetailView):
+class RideAlert(UpdateView):
     model = Ride
     context_object_name = 'alerts'
     template_name = 'rides/executive/ride_alerts.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rider']
-        # context[""]
+        ride = self.get_object()
+        context['rider'] = ride.rider
         return context
 
 @method_decorator([login_required, executive_required], name='dispatch')

@@ -13,7 +13,6 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from background_task import background
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView
-
 from rides.utils.google_api_util import GoogleApiHandler
 from rides.utils.random_locations import Location_Generator
 from rides.utils.s2_get_cap import GetCap
@@ -21,12 +20,10 @@ from ..decorators import rider_required
 from ..forms import RiderSignUpForm, BookRideViewForm
 from ..models import Status, User, Ride, Executive, Cab
 
-
 class RiderSignUp(CreateView):
     model = User
     form_class = RiderSignUpForm
     template_name = 'registration/signup_form.html'
-
     gAPI = GoogleApiHandler()
     cap = GetCap()
     gL = Location_Generator()
@@ -46,7 +43,6 @@ class SetLocation(CreateView):
     model = Ride
     form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
-
     gAPI = GoogleApiHandler()
 
     def get_context_data(self, **kwargs):
@@ -90,71 +86,18 @@ class SetLocation(CreateView):
         ride_status = Status.objects.get(name="On Queue")
         ride.status = ride_status
         ride.rider = self.request.user
-        
         data = self.gAPI.calculate_distance(orig=ride.source, dest=ride.destination)
         ride.travelled = int(data['rows'][0]['elements'][0]['distance']['value'])/1000
         total_duration = data['rows'][0]['elements'][0]['duration']['value']
         ride.charges = self.gAPI.calculate_cost(ride.travelled, total_duration)
         ride.save()
-        partners = Executive.objects.filter(is_engaged=False)
-        for x in self.give_active_shifts(ride.date_time):
-            queryset = partners.filter(shift=x)
-            if not cabees:
-                cabees = queryset
-            else:
-                cabees.union(queryset)
-        # Create random cab locations in the city
-        for cabee in cabees:
-            random_loc = gL.random_points(10, gL.get_coor(ride.source))
-            cabee.car.lat = random_loc[0]
-            cabee.car.lng = random_loc[1]
-            cabee.car.save()
-
-        get_cabs(ride, cabee_list, 200, schedule=timezone.now())
+        status_string = self.give_active_shifts(ride.date_time)
+        random_locations(ride, 6000, cabees, status_string, schedule=timezone.now())
+        get_close_cabs(ride, cabees, status_string, 150, schedule=timezone.now())
         return redirect('rider:live', ride.pk)
 
-        # Initiate randome location creation
-        status_string = self.give_active_shifts(ride.date_time)
-        for i in st:
-            if not cabees:
-                cabees = Executive.objects.filter(shift=i)
-            else:
-                cabees.union(Executive.objects.filter(shift=i))
-        cabees = cabees.filter(is_engaged=False)
-        
-        random_locations(ride, 6000, status_string, cabees, schedule=timezone.now())
-        get_close_cabs(ride, cabees, schedule=timezone.now())
-
-        # create_car_posititons(ride.source, Executive.objects.filter(e.date_time))
-
 @background
-def get_cabs(self, ride, cabees, radius):
-    cap = GetCap()
-    while(True):
-        region = cap.find_cover(radius, ride.source)
-        close_by_cabs = []
-        for cabee in cabees:
-            if cap.contains([cabee.car.lat, cabee.car.lng], region):
-                close_by_cabees.append(cabee)
-        for cabee in close_by_cabees:
-            ride.cab = cabee.cab
-            ride.cabee = cabee
-            ride.save()
-            cabee.is_engaged = True
-            old.is_engaged = False
-            old.save()
-            print(ride.cabee.user.name)
-            time.sleep(60)
-            old = cabee
-
-        radius = radius + 100
-
-        if radius > 4500:
-            break
-    
-
-@background
-def random_locations(ride, radius, st, cabees):
+def random_locations(ride, radius, cabees, st):
     g_l = Location_Generator()
     for i in st:
         if not cabees:
@@ -162,30 +105,69 @@ def random_locations(ride, radius, st, cabees):
         else:
             cabees.union(Executive.objects.filter(shift=i))
     cabees = cabees.filter(is_engaged=False)
-    
     for cabee in cabees:
         curr_loc = g_l.random_points(radius, g_l.get_coor(ride.source))
         cabee.car.lat = curr_loc[0]
         cabee.car.lng = curr_loc[1]
-        cabee.car.save() 
+        cabee.car.save()
 
 @background
-def get_close_cabs(ride, cabees):
+def get_close_cabs(ride, cabees, st, rad):
     s2_cap = GetCap()
-    rad = 150
+    gAPI = GoogleApiHandler()
+    data = self.gAPI.calculate_distance(orig=ride.source, dest=ride.destination)
+    for i in st:
+        if not cabees:
+            cabees = Executive.objects.filter(shift=i)
+        else:
+            cabees.union(Executive.objects.filter(shift=i))
+    cabees = cabees.filter(is_engaged=False)
     while True:
-        s2_cap.find_cover(150, Location_Generator.get_coor(ride.source))
-
+        s2_cap.find_cover(rad, Location_Generator.get_coor(ride.source))
         for cabee in cabees:
             if s2_cap.contains([cabee.car.lat, cabee.car.lng]):
                 ride.cabee = cabee
                 ride.status = Status(name="Ongoing")
-                
-
-        rad = rad + 100    
-        if rad > 4000:
+                ride.save()
+                cabee.save()
+                # time.sleep(60)
+                if not old:
+                    old = cabee
+                else:
+                    old.is_engaged=False
+                    old.save()
+                if ride.status = Status(name="Ongoing") and cabee.is_engaged == True:
+                    origin = str(cabee.car.lat) + ',' + str(cabee.car.lng)
+                    req_time = data = self.gAPI.calculate_distance(orig=origin, dest=ride.source)
+                    dur = int(data['rows'][0]['elements'][0]['duration']['value']/60)
+                    time = timezone.now()
+                    while(True):
+                        time.sleep(5)
+                        time = timezone.now()
+                        if ride.status == Status(name="On Queue"):
+                            flag = True
+                            break
+                        if time.hour == ride.updated_time.hour + 1:
+                            if time.minute + (60 - ride.updated_time.minute) >= dur:
+                                break
+                            else:
+                                continue
+                        elif time.hour == ride.updated_time.hour:
+                            if time.minute - ride.updated_time.minute >= dur:
+                                break
+                            else:
+                                continue
+                    if flag == True:
+                        continue
+                    else:
+                        ride_started = True
+                        break
+        if not ride_started:
+            rad = rad + 100
+            if rad > 4000:
+                break
+        else:
             break
-    
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class BookRide(DetailView):
