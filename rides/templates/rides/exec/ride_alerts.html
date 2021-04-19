@@ -1,6 +1,25 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
-
-    <h2>Live Rider Requests<h2>
-(% endblock %)
+    <h4>Live Rider Requests<h4>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <!-- {{form|crispy}} -->
+        {% if ride_available %}
+            <div class="container">
+                <div class="container m-2">
+                    Rider : {{ ride.rider.name }}
+                    <br>
+                    Source : {{ ride.source }}
+                    <br>
+                    Dest : {{ ride.destination }}
+                </div>
+                <div class="row">
+                    <button class="btn btn-lg btn-success" name="a_ride" type="submit">Accept Ride</button>
+                    <button class="btn btn-lg btn-danger" name="c_ride" type="submit">Cancel Ride</button>
+                </div>
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}

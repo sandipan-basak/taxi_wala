@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static%}
+{% load crispy_forms_tags %}
+{% block content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/get_ride.css' %}">
+  <img src="{% static 'images/map_view/pickup_marker.png' %}" alt="" id="pickup_icon" style="display: none;">
+  <img src="{% static 'images/map_view/drop_marker.jpg' %}" alt="" id="drop_icon" style="display: none;">
+  <div class="row">
+    <div class="col-5">
+      <h3 class="d-flex justify-content-center">Maps</h3>
+    </div>
+    <div class="col-7" id="map_container">
+      <!-- <div class="container w-100 h-100" id="map"></div> -->
+    </div>
+  </div>
+  <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script>
+{% endblock %}

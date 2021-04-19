@@ -16,5 +16,7 @@ urlpatterns = [
         path('live/', executive.RideAlert.as_view(), name='alerts'),
         path('payments/', executive.Payments.as_view(), name='payments'),
         path('history/', executive.Rides.as_view(), name='history'),
+        path('maps/', executive.Maps.as_view(), name='maps')
     ], 'rides'), namespace='exec')),
 ]
+

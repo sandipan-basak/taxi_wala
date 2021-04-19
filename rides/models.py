@@ -19,7 +19,7 @@ class User(AbstractUser):
 #     state = models.CharField(max_length=120)
 #     city = models.CharField(max_length=120)
 #     country = models.CharField(max_length=120)
-#     address = models.CharField(max_length=200)
+#     address = models.CharField
 
 class Cab(models.Model):
     number = models.CharField(max_length=20, unique=True)
@@ -39,6 +39,7 @@ class Executive(models.Model):
     avg_r = models.DecimalField(max_digits=2, decimal_places=1, default=4.0)
     reg_city = models.CharField(max_length=200)
     is_engaged = models.BooleanField(default=False)
+    reached_loc = models.BooleanField(default=False)
     def __str__(self):
         return self.user.username
 
@@ -67,6 +68,7 @@ class Ride(models.Model):
     charges = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     source = models.CharField(max_length=200, blank=False)
     destination = models.CharField(max_length=200, blank=False)
+    is_started = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.pk)

@@ -7,8 +7,10 @@ from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView, UpdateView)
-
+from django.views import View
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView, UpdateView, TemplateView)
+from django.views.generic.edit import FormMixin
+from django.urls import reverse_lazy
 from ..decorators import executive_required
 from ..forms import ExecutiveSignUpForm
 from ..models import User, Ride, Executive, Status
@@ -26,29 +28,107 @@ class ExecSignUp(CreateView):
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect('rider:book')
+        return redirect('exec:alerts')
 
 @method_decorator([login_required, executive_required], name='dispatch')
 class RideAlert(UpdateView):
-    model = Ride
-    context_object_name = 'alerts'
-    template_name = 'rides/executive/ride_alerts.html'
-    
+    model = Executive
+    fields = '__all__'
+    template_name = 'rides/exec/ride_alerts.html'
+
+    def get_object(self):
+        return self.request.user.executive
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ride = self.get_object()
-        context['rider'] = ride.rider
+        partner = self.get_object()
+        print(partner.user.name)
+        st = Status.objects.get(name="On Queue")
+        curr_ride = partner.ride_set.all().filter(status=st).first()
+        context["curr_position"] = [partner.car.lat, partner.car.lng]
+        if not curr_ride:
+            context['ride_available'] = False
+        else:
+            context['ride_available'] = True
+            context['ride'] = curr_ride
+            print(context['ride'].rider.name)
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+        partner = self.get_object()
+        on = Status.objects.get(name="Ongoing")
+        curr_ride = context['ride']
+        if 'c_ride' in request.POST:
+            print("cancels ride")
+            curr_ride.cabee = None
+            curr_ride.save()
+            return redirect('exec:alerts')
+        elif 'a_ride' in request.POST:
+            partner.is_engaged = True
+            partner.save()
+            curr_ride.status = on
+            curr_ride.save()
+            return redirect('exec:maps')        
+        return render(request, self.template_name, context=context)    
+
+@method_decorator([login_required, executive_required], name='dispatch')
+class Maps(UpdateView):
+    model = Executive
+    fields = '__all__'
+    template_name = 'rides/exec/map_view.html' 
+
+    def get_object(self):
+        return self.request.user.executive
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        partner = self.get_object()
+        status = Status.objects.get(name="Ongoing")
+        context['ride_available'] = partner.is_engaged
+        context['curr_position'] = [partner.car.lat, partner.car.lng]
+        if partner.is_engaged:
+            ride = partner.ride_set.filter(status=status).first()
+            context['ride'] = ride
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        partner = self.get_object()
+        context = self.get_context_data(**kwargs)
+        curr_ride = context['ride']
+        complete = Status.objects.get(name="Completed")
+        cancel = Status.objects.get(name="Cancelled")
+        if request.method == 'POST':
+            if 'c_ride' in request.POST:
+                curr_ride.cabee = None
+                curr_ride.status = cancel
+                curr_ride.save()
+            elif 's_ride' in request.POST:
+                curr_ride.is_started = True
+                curr_ride.save()
+            elif 'f_ride' in request.POST:
+                curr_ride.is_started = False
+                curr_ride.status = complete
+                curr_ride.save()
+            return redirect(self.template_name)
+        return render(request, self.template_name, context=context)
 
 @method_decorator([login_required, executive_required], name='dispatch')
 class Payments(DetailView):
     pass
 
 @method_decorator([login_required, executive_required], name='dispatch')
+class EndRide(UpdateView):
+    pass
+
+
+@method_decorator([login_required, executive_required], name='dispatch')
 class Rides(ListView):
     model = Ride
     
     def get_queryset(self, **kwargs):
-        rider = self.request.user.rider
+        rider = self.request.user
         queryset = Ride.objects.filter(rider=rider)
         return queryset

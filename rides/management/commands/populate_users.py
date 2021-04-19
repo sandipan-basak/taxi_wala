@@ -18,7 +18,6 @@ class Command(BaseCommand):
         path = os.path.dirname(os.path.realpath(__file__)) + '/user_pass.json'     
         json_file = open(path, 'a+')
         filesize = os.path.getsize(path)
-
         if filesize == 0:
             data = {}
             data['users'] = []
@@ -27,11 +26,9 @@ class Command(BaseCommand):
             data = json.load(json_file)
             json_file.close()
             json_file = open(path, 'w+')
-
         data['users'].extend(users)
         json.dump(data, json_file, indent=4)
         json_file.close()
-
 
     def populate_execs(self, n=2):
         data = []
@@ -41,18 +38,17 @@ class Command(BaseCommand):
             pas_ = self.gu.get_random_string(10)
             uname = self.gu.generate_username(name)
             car_number = self.lic.generate_license_plate()
-
             cab = Cab.objects.create(number=car_number)
-            user = User.objects.create(username=uname, name=name, password=pas_, is_ex=True, is_rider=False)
+            user = User.objects.create(username=uname, name=name, is_ex=True, is_rider=False)
+            user.set_password(pas_)
+            user.save()
             Executive.objects.create(user=user, car=cab, shift=shift)
-
             data.append({
                 "name": name,
                 "username": uname,
                 "pass": pas_,
                 "rider": False
             })
-
         self.save_json(data)
 
     def populate_rider(self, n=2):
@@ -73,19 +69,16 @@ class Command(BaseCommand):
                 "pass": pas_,
                 "rider": True
             })
-
         self.save_json(data)
 
     def add_arguments(self, parser):
         parser.add_argument('limit', metavar='Limit', type=int, 
-                    help='Number of users... By default the users are executives..')
-
+                    help='Number of users... By default the users are riders..')
         parser.add_argument(
                 '--rider',
                 action='store_true',
                 help='Populate Riders',
             )
-
         parser.add_argument(
                 '--exec',
                 action='store_true',
@@ -98,4 +91,4 @@ class Command(BaseCommand):
             print("Driving partners added...!!")
         else:
             self.populate_rider(options['limit'])
-            print("Rider users added...!!")
+            print("Riders added...!!")

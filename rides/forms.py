@@ -3,9 +3,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.forms import widgets
-from .models import User, Executive, Ride, Cab
+from .models import User, Executive, Ride, Cab, Status
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Field
+from crispy_forms.layout import Layout, Submit, Row, Column, Field, ButtonHolder, Submit
 
 class RiderSignUpForm(UserCreationForm):
 
@@ -18,7 +18,7 @@ class RiderSignUpForm(UserCreationForm):
         self.fields.pop('password2')
         for fieldname in ['name', 'username', 'password1']:
             self.fields[fieldname].help_text = None
-            
+
     @transaction.atomic
     def save(self):
         user = super().save(commit=False)
@@ -72,7 +72,6 @@ class BookRideViewForm(forms.ModelForm):
     class Meta:
         model = Ride
         fields = ('source', 'destination')
-
         widgets = {
             'source': forms.HiddenInput,
             'destination': forms.HiddenInput,
@@ -85,5 +84,22 @@ class BookRideViewForm(forms.ModelForm):
         self.helper.layout = Layout(
             Field('source', css_id="pickup_loc", css_class="search_p w-100 col-11", type="text"),
             Field('destination', css_class="search_d w-100 col-11", css_id="drop_loc", type="text"),
-            # Field('date_time', css_class="container", css_id="get_date", type="text"),
         )
+
+# class RideAcceptForm(forms.ModelForm):
+
+#     class Meta:
+#         model = Executive
+#         fields = ('is_engaged', )
+#         widgets = {
+#             'is_engaged': forms.HiddenInput
+#         }
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.helper = FormHelper
+#         self.helper.layout = Layout(
+#             ButtonHolder(
+#                 Submit('save', 'SAVE')
+#             )
+#         )

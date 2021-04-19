@@ -30,7 +30,7 @@ class Location_Generator():
         t = 2 * math.pi * random.random()
         radius = self.random_radius(radius)
         x = self.convert_lat(111*data[0] + radius * math.cos(t))
-        y = self.convert_lat(111.321*data[1] + radius * math.sin(t))
+        y = self.convert_lng(111.321*data[1] + radius * math.sin(t))
         return [x, y]
 
 # gg = Location_Generator()
