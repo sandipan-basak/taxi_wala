@@ -2,17 +2,54 @@
 {% load static%}
 {% load crispy_forms_tags %}
 {% block content %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/get_ride.css' %}">
-  <img src="{% static 'images/map_view/pickup_marker.png' %}" alt="" id="pickup_icon" style="display: none;">
-  <img src="{% static 'images/map_view/drop_marker.jpg' %}" alt="" id="drop_icon" style="display: none;">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/partner_view.css' %}">
+  <img class="d-none" src="{% static 'images/map_view/pickup_marker.png' %}" alt="" id="pickup_icon">
+  <img class="d-none" src="{% static 'images/map_view/drop_marker.jpg' %}" alt="" id="drop_icon">
+  <img class="d-none" src="{% static 'images/map_view/partner_pos.png' %}" alt="" id="partner_pos">
   <div class="row">
-    <div class="col-5">
+    <div class="container">
       <h3 class="d-flex justify-content-center">Maps</h3>
     </div>
-    <div class="col-7" id="map_container">
-      <!-- <div class="container w-100 h-100" id="map"></div> -->
+  </div>
+  <div class="d-none">
+    <input id="lat" type="text" value="{{curr_position.0}}"></input>
+    <input id="lng" type="text" value="{{curr_position.1}}"></input>
+    <input id="available" type="text" value="{{ride_available}}"></input>
+  </div>
+  <div class="row" style="height: 500px">
+    <div class="w-100" id="map_container">
+      <div class="container w-100 h-100" id="map"></div>
     </div>
   </div>
-  <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
+  {% if ride_available %}
+    <div class="d-none">
+      <input id="s_lat" type="text" value="{{source.0}}"></input>
+      <input id="s_lng" type="text" value="{{source.1}}"></input>
+      <input id="d_lat" type="text" value="{{dest.0}}"></input>
+      <input id="d_lng" type="text" value="{{dest.1}}"></input>
+      <input class="d-none" id="started" type="text" value="False"></input>
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row my-4">
+        {% if not ride.is_started %}
+        <div class="w-100">
+          <button class="btn-lg btn-info" type="submit" name="s_ride"> Start Ride</button>
+          <button class="btn-lg btn-danger" type="submit" name="c_ride">Cancel Ride</button>
+        </div>
+        {% else %}
+          <div class="w-100">
+            <script>
+              var st = document.getElementById("started");
+              st.value = "True"
+            </script>
+            <button class="btn-lg btn-success" type="submit" name="f_ride">Finish Ride</button>
+            <button class="btn-lg btn-danger" type="submit" name="c_ride">Cancel Ride</button>
+          </div>
+        {% endif %}
+      </div>
+      </form>
+  {% endif %}
+  <script defer src="{% static 'js/map_view/partner_view.js' %}" alt="No script"></script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script>
 {% endblock %}

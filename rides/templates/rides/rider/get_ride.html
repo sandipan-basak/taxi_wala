@@ -31,11 +31,15 @@
           </div>
         </div>
         <div id="sr_btn" class="d-flex justify-content-center my-2">
-          <button type="submit" id="search_now" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
-          <button type="submit" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
+          {% if ride_available %}
+            <a type="button" id="search_now" href="{% url 'rider:live' %}" class="btn btn-info btn-lg col-6 mx-2">Search Ride</a>
+          {% else %}
+            <button type="submit" id="search_now" class="btn btn-info btn-lg col-6 mx-2">Search Ride</button>
+            <button type="submit" class="btn btn-warning btn-lg col-6 mx-2">Ride Later</button>
+          {% endif %}
         </div>
         <div class="row">
-          <button type="button" style="display: none;" id="ongoing_btn" class="btn btn-info btn-sm mx-2">Ride Page</button>
+          <button type="button" style="display: none;" id="ongoing_btn" class="btn btn-info btn-lg mx-2">Ride Page</button>
         </div>
         <div>
           {{ form | crispy }}
@@ -47,20 +51,6 @@
     </div>
   </div>
   <script>
-    var o_r_f = "{{ ride_flag }}";
-    var reload;
-    var btn_o = document.querySelector("#ongoing_btn");
-    if (o_r_f === "1" || o_r_f === "2"){
-      btn_o.style.display = "block";
-      reload = () => {
-        return  "{% url 'rider:live' r_pk %}"
-      };
-      btn_o.onclick = window.locaion.href=reload();
-      // debugger;
-      // console.log(r_pk);
-    }
-
-
   </script>
   <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script>

@@ -56,7 +56,7 @@ def get_close_cabs(pk, st):
             print(region)
             if s2_cap.has([cabee.car.lat, cabee.car.lng], region):
                 ride.cabee = cabee
-                # ride.status = Status(name="Ongoing")
+                ride.cab = cabee.car
                 ride.save()
                 # Waiting for cabee to accept
                 if ride.status == Status.objects.get(name="On Queue") and cabee.is_engaged == False:

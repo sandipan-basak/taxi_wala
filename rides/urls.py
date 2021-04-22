@@ -4,12 +4,10 @@ from .views import rides, executive, rider
 
 urlpatterns = [
     path('', rides.home, name='home'),
-
     path('r/', include(([
         path('', rider.SetLocation.as_view(), name='book'),
-        path('live/<int:pk>', rider.BookRide.as_view(), name='live'),
-        # path('/results/', teachers.QuizResultsView.as_view(), name='quiz_results'),
-        path('status/', rider.RideView.as_view(), name='status'),
+        path('live/', rider.BookRide.as_view(), name='live'),
+        # path('status/', rider.RideView.as_view(), name='status'),
         path('rides/', rider.PastRides.as_view(), name='history'),
     ], 'rides'), namespace='rider')),
     path('e/', include(([

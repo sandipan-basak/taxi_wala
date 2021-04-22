@@ -15,6 +15,9 @@ from ..decorators import executive_required
 from ..forms import ExecutiveSignUpForm
 from ..models import User, Ride, Executive, Status
 
+from rides.utils.google_api_util import GoogleApiHandler
+from rides.utils.random_locations import Location_Generator
+
 class ExecSignUp(CreateView):
     model = User
     form_class = ExecutiveSignUpForm
@@ -77,42 +80,61 @@ class RideAlert(UpdateView):
 class Maps(UpdateView):
     model = Executive
     fields = '__all__'
-    template_name = 'rides/exec/map_view.html' 
-
+    template_name = 'rides/exec/map_view.html'
+    gL = Location_Generator()
+    gAPI = GoogleApiHandler()
+    
     def get_object(self):
         return self.request.user.executive
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         partner = self.get_object()
+        print(partner.user.username)
         status = Status.objects.get(name="Ongoing")
-        context['ride_available'] = partner.is_engaged
+        context['ride_available'] = False if not partner.is_engaged else True
+        print(context['ride_available'])
         context['curr_position'] = [partner.car.lat, partner.car.lng]
-        if partner.is_engaged:
+        if context['ride_available']:
             ride = partner.ride_set.filter(status=status).first()
             context['ride'] = ride
+            context['source'] = self.gL.get_coor(ride.source)
+            print(context['source'])
+            context['dest'] = self.gL.get_coor(ride.destination)
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         partner = self.get_object()
         context = self.get_context_data(**kwargs)
-        curr_ride = context['ride']
-        complete = Status.objects.get(name="Completed")
-        cancel = Status.objects.get(name="Cancelled")
-        if request.method == 'POST':
-            if 'c_ride' in request.POST:
-                curr_ride.cabee = None
-                curr_ride.status = cancel
-                curr_ride.save()
-            elif 's_ride' in request.POST:
-                curr_ride.is_started = True
-                curr_ride.save()
-            elif 'f_ride' in request.POST:
-                curr_ride.is_started = False
-                curr_ride.status = complete
-                curr_ride.save()
-            return redirect(self.template_name)
+        if context['ride_available']:
+            curr_ride = context['ride']
+            complete = Status.objects.get(name="Completed")
+            cancel = Status.objects.get(name="Cancelled")            
+            if request.method == 'POST':
+                if 'c_ride' in request.POST:
+                    curr_ride.cabee = None
+                    curr_ride.cab = None
+                    curr_ride.status = cancel
+                    curr_ride.save()
+                    partner.is_engaged = False
+                    partner.save()
+                    context['ride_available'] = False
+                elif 's_ride' in request.POST:
+                    curr_ride.is_started = True
+                    curr_ride.save()
+                    cab_reached = self.gAPI.get_nearest_road(self.gL.get_coor(curr_ride.source))
+                    partner.car.lat = cab_reached[0]
+                    partner.car.lng = cab_reached[1]
+                    partner.car.save()
+                    context['curr_position'] = [partner.car.lat, partner.car.lng]
+                elif 'f_ride' in request.POST:
+                    curr_ride.is_started = False
+                    curr_ride.status = complete
+                    curr_ride.save()
+                    partner.is_engaged = False
+                    partner.save()
+                    context['ride_available'] = False
         return render(request, self.template_name, context=context)
 
 @method_decorator([login_required, executive_required], name='dispatch')

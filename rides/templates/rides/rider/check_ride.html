@@ -5,51 +5,28 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/map_view/get_ride.css' %}">
   <div class="row">
     <div class="col-5">
-      <!-- <h2 class="container">Loading...</h2> -->
       <div class="container">
-        <p class="h5">Distnace: {{ride.travelled}} kms</p>
-        <p class="h5">Estimated fare: Rs.{{ride.charges}}</p>
-        {% if not ride.cabee %}
-          <p class="h5">Looking for nearby cars...!!</p>
+        {% if not ride %}
+          <p class="h5">Book a Ride</p>
         {% else %}
-        <p class="h5">Driving Partner: {{ ride.cabee }}</p>
-        <p class="h5">Car for the ride: {{ ride.cab }}</p>
+          <p class="h5">Distnace: {{ride.travelled}} kms</p>
+          <p class="h5">Estimated fare: Rs.{{ride.charges}}</p>
+          {% if not ride.cabee %}
+            <p class="h5">Looking for nearby cars...!!</p>
+          {% else %}
+            <p class="h5">Driving Partner: {{ ride.cabee }}</p>
+            <p class="h5">Car for the ride: {{ ride.cab }}</p>
+            {% if ride.is_started %}
+              <p class="h5">Ride started...!!</p>
+            {% else %}
+              <p class="h5">Partner reaching you location...!!</p>
+            {% endif %}
+          {% endif %}
         {% endif %}
+        
       </div>
     </div>
-    <!-- <div class="col-7" id="map_container">
-      <div class="container w-100 h-100" id="map"></div>
-    </div> -->
   </div>
-  <script>
-    document.onmouseover = function() {
-    //User's mouse is inside the page.
-      window.innerDocClick = true;
-    }
-    document.onmouseleave = function() {
-    //User's mouse has left the page.
-      window.innerDocClick = false;
-    }
-    window.onhashchange = function() {
-      if (window.innerDocClick) {
-        //Your own in-page mechanism triggered the hash change
-        window.innerDocClick = false;
-      } else {
-        //Browser back button was clicked
-        window.location.href = "{% url 'rider:book' %}";
-      }
-    }
-    $(function(){
-      var rx = /INPUT|SELECT|TEXTAREA/i;
-      $(document).bind("keydown keypress", function(e){
-        if( e.which == 8 ){ // 8 == backspace
-          if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
-            e.preventDefault();
-          }
-        }
-      });
-    });
-  </script>
   <!-- <script defer src="{% static 'js/map_view/locate.js' %}" alt="No script"></script>  
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8yOuNdpcUpjV3ilOJbrdZtrey9BHNStA&callback=initMap&libraries=places&v=weekly"></script> -->
 {% endblock %}

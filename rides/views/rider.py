@@ -38,7 +38,7 @@ class RiderSignUp(CreateView):
 @method_decorator([login_required, rider_required], name='dispatch')
 class SetLocation(CreateView):
     model = Ride
-    # form_class = BookRideViewForm
+    form_class = BookRideViewForm
     template_name = 'rides/rider/get_ride.html'
     gAPI = GoogleApiHandler()
 
@@ -49,18 +49,11 @@ class SetLocation(CreateView):
         onqueue_ride = status_oq.filter(rider=self.request.user).first()
         ongoing_ride = status_og.filter(rider=self.request.user).first()
         if not onqueue_ride and not ongoing_ride:
-            context["ride_flag"] = 0
-            context["r_pk"] = 1
-        elif not ongoing_ride:
-            context["ride_flag"] = 1
-            context["r_pk"] = onqueue_ride.pk
-        else:
-            context["ride_flag"] = 2
-            context["r_pk"] = ongoing_ride.pk
-        print(context["ride_flag"])
-        print(context["r_pk"])
-        return context   
-        
+            context["ride_available"] = False
+        else: 
+            context["ride_available"] = True
+        return context
+
     def form_valid(self, form):
         ride = form.save()
         status = Status.objects.get(name="On Queue")
@@ -75,50 +68,64 @@ class SetLocation(CreateView):
         status_string = give_active_shifts(ride.date_time.time())
         back.random_locations(ride.id, status_string, schedule=timezone.now())
         # random_locations(ride.id, status_string, schedule=timezone.now())
-        return redirect('rider:live', ride.pk)
+        return redirect('rider:live')
 
 def give_active_shifts(time):
-        UTC_m_time = datetime.strptime("02:30:00", "%H:%M:%S").time()
-        UTC_me_time = datetime.strptime("11:30:00", "%H:%M:%S").time()
-        UTC_e_time = datetime.strptime("10:30:00", "%H:%M:%S").time()
-        UTC_ee_time = datetime.strptime("19:30:00", "%H:%M:%S").time()
-        UTC_n_time = datetime.strptime("18:30:00", "%H:%M:%S").time()
-        UTC_ne_time = datetime.strptime("03:30:00", "%H:%M:%S").time()
-        status = ""
-        if UTC_m_time < time < UTC_me_time:
-            status = status + "M"
-        if UTC_e_time < time < UTC_ee_time:
-            status = status + "E"
-        if UTC_n_time < time < UTC_ne_time:
-            status = status + "N"
-        return status
+    UTC_m_time = datetime.strptime("02:30:00", "%H:%M:%S").time()
+    UTC_me_time = datetime.strptime("11:30:00", "%H:%M:%S").time()
+    UTC_e_time = datetime.strptime("10:30:00", "%H:%M:%S").time()
+    UTC_ee_time = datetime.strptime("19:30:00", "%H:%M:%S").time()
+    UTC_n_time = datetime.strptime("18:30:00", "%H:%M:%S").time()
+    UTC_ne_time = datetime.strptime("03:30:00", "%H:%M:%S").time()
+    status = ""
+    if UTC_m_time < time < UTC_me_time:
+        status = status + "M"
+    if UTC_e_time < time < UTC_ee_time:
+        status = status + "E"
+    if UTC_n_time < time < UTC_ne_time:
+        status = status + "N"
+    return status
 
 @method_decorator([login_required, rider_required], name='dispatch')
-class BookRide(DetailView):
-    model = Ride
+class BookRide(UpdateView):
+    model = User
+    fields = '__all__'
     template_name = 'rides/rider/check_ride.html'
-    gAPI = GoogleApiHandler()
+
+    def get_object(self):
+        return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ride = self.get_object()
-        context[' rider'] = ride.rider
-        context['cab'] = ride.cab
-        context['cabee'] = ride.cabee
-        return context
+        rider = self.get_object()
+        # context['rider'] = rider
+        print(rider.username)
+        ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
+        context['ride'] = ride
+        if not ride:
+            return context
+        else:
+            context['cab'] = ride.cab
+            context['cabee'] = ride.cabee
+            return context
 
-@method_decorator([login_required, rider_required], name='dispatch')
-class RideView(DetailView):
-    model = Ride
-    context_object_name = 'ride'
-    template_name = 'rides/rider/ride_status.html'
-
-    def get_context_data(self, **kwargs):
-        kwargs['rider'] = self.get_object().rider
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         
-        kwargs['cabee'] = self.get_object().cabee
+        return render(request, self.template_name, context=context)
 
-        return super().get_context_data(**kwargs)
+# @method_decorator([login_required, rider_required], name='dispatch')
+# class RideView(DetailView):
+#     model = Ride
+#     context_object_name = 'ride'
+#     template_name = 'rides/rider/ride_status.html'
+
+#     def get_context_data(self, **kwargs):
+#         kwargs['rider'] = self.get_object().rider
+        
+#         kwargs['cabee'] = self.get_object().cabee
+
+#         return super().get_context_data(**kwargs)
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class PastRides(ListView):
