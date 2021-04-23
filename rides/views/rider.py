@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -50,7 +50,7 @@ class SetLocation(CreateView):
         ongoing_ride = status_og.filter(rider=self.request.user).first()
         if not onqueue_ride and not ongoing_ride:
             context["ride_available"] = False
-        else: 
+        else:
             context["ride_available"] = True
         return context
 
@@ -66,7 +66,7 @@ class SetLocation(CreateView):
         ride.status = Status.objects.get(name="On Queue")
         ride.save()
         status_string = give_active_shifts(ride.date_time.time())
-        back.random_locations(ride.id, status_string, schedule=timezone.now())
+        back.random_postitions(ride.id, status_string, schedule=timezone.now())
         # random_locations(ride.id, status_string, schedule=timezone.now())
         return redirect('rider:live')
 
@@ -99,19 +99,38 @@ class BookRide(UpdateView):
         context = super().get_context_data(**kwargs)
         rider = self.get_object()
         # context['rider'] = rider
-        print(rider.username)
-        ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
-        context['ride'] = ride
+        status_oq = Status.objects.get(name="On Queue")
+        status_og = Status.objects.get(name="Ongoing")
+        ride = rider.ride_set.all().filter(
+            Q(status=status_oq) | Q(status=status_og)
+        ).first()
+        # onqueue_ride = rider.ride_set.all().filter(status=status_oq).first()
+        # ongoing_ride = rider.ride_set.all().filter(status=status_og).first()
         if not ride:
-            return context
+            context["ride_available"] = False
         else:
-            context['cab'] = ride.cab
-            context['cabee'] = ride.cabee
-            return context
+            context["ride_available"] = True
+            context['ride'] = ride
+            print(ride.rider.username)
+        # ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
+        # context['ride'] = ride
+        # if not ride:
+        #     context['ride_available'] = False
+        # else:
+        #     context['ride_available'] = True
+        return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        
+        # context = {}
+        # rider = self.get_object()
+        # ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
+        # print("rider", ride.rider)
+        # if ride is not None:
+        #     context['ride_available'] = True
+        #     context['ride'] = ride
+        # else:
+        #     context['ride_available'] = False
         return render(request, self.template_name, context=context)
 
 # @method_decorator([login_required, rider_required], name='dispatch')
