@@ -1,5 +1,5 @@
 """
-WSGI config for uber_clone project.
+WSGI config for taxi_wala project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uber_clone.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'taxi_wala.settings')
 
 application = get_wsgi_application()
