@@ -47,7 +47,7 @@ def get_close_cabs(id, st):
         # cabees = cabees.filter(is_engaged=False)
         region = s2_cap.find_cover(rad, loc.get_coor(ride.source)) 
         if cabees is None:
-            "No cabs available, try another time...!!"
+            print("No cabs available, try another time...!!")
             break
         for cabee in cabees:
             print(cabee.user.username)
