@@ -1,4 +1,3 @@
-# Taxi Wala
 
 # Request a Ride:
 
