@@ -1,6 +1,18 @@
 {% extends "base.html" %}
-
+<!-- {#% load static %} -->
 {% block content %}
-
-    <h2>Ride History<h2>
-(% endblock %)
+    {% if ride_available %}
+        {% for ride in rides %}
+            <div class="row my-2">
+                <div class="card w-100">
+                    <li>From {{ ride.source }} to {{ ride.destination }}</li>
+                    <li>{{ ride.cabee.user.name }}</li>
+                    <li>{{ ride.date_time }}</li>
+                    <li>{{ ride.status.name }}</li>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>No rides started yet</h3>
+    {% endif %}
+{% endblock %}

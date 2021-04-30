@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{#% load static %}
+{% block content %}
+    {% if ride_available %}
+        {% for ride in rides %}
+            <div class="row my-2">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <li>From {{ ride.source }} to {{ ride.destination }}</li>
+                        <li>{{ ride.rider.name }}</li>
+                        <li>{{ ride.date_time }}</li>
+                        <li>{{ ride.status.name }}</li>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>No rides started yet</h3>
+    {% endif %}
+{% endblock %}

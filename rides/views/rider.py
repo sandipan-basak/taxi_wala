@@ -67,7 +67,6 @@ class SetLocation(CreateView):
         ride.save()
         status_string = give_active_shifts(ride.date_time.time())
         back.random_postitions(ride.id, status_string, schedule=timezone.now())
-        # random_locations(ride.id, status_string, schedule=timezone.now())
         return redirect('rider:live')
 
 def give_active_shifts(time):
@@ -104,58 +103,33 @@ class BookRide(UpdateView):
         ride = rider.ride_set.all().filter(
             Q(status=status_oq) | Q(status=status_og)
         ).first()
-        # onqueue_ride = rider.ride_set.all().filter(status=status_oq).first()
-        # ongoing_ride = rider.ride_set.all().filter(status=status_og).first()
         if not ride:
             context["ride_available"] = False
         else:
             context["ride_available"] = True
             context['ride'] = ride
             print(ride.rider.username)
-        # ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
-        # context['ride'] = ride
-        # if not ride:
-        #     context['ride_available'] = False
-        # else:
-        #     context['ride_available'] = True
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        # context = {}
-        # rider = self.get_object()
-        # ride = rider.ride_set.all().filter(status=Status.objects.get(name="Ongoing")).first()
-        # print("rider", ride.rider)
-        # if ride is not None:
-        #     context['ride_available'] = True
-        #     context['ride'] = ride
-        # else:
-        #     context['ride_available'] = False
+
         return render(request, self.template_name, context=context)
-
-# @method_decorator([login_required, rider_required], name='dispatch')
-# class RideView(DetailView):
-#     model = Ride
-#     context_object_name = 'ride'
-#     template_name = 'rides/rider/ride_status.html'
-
-#     def get_context_data(self, **kwargs):
-#         kwargs['rider'] = self.get_object().rider
-        
-#         kwargs['cabee'] = self.get_object().cabee
-
-#         return super().get_context_data(**kwargs)
 
 @method_decorator([login_required, rider_required], name='dispatch')
 class PastRides(ListView):
     model = Ride
+    context_object_name = "rides"
+    template_name = 'rides/rider/ride_history.html'
+    queryset = Ride.objects.exclude(status=Status.objects.get(name="On Queue"))
     
-    def get_queryset(self, **kwargs):
-        rider = self.request.user
-        queryset = Ride.objects.filter(rider=rider)
+    def get_queryset(self):
+        queryset = self.queryset.filter(rider=self.request.user)
+        # print(queryset)
         return queryset
-
-# @login_required
-# @rider_required
-# def update_ride(request, pk):
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ride = self.queryset.filter(rider=self.request.user)
+        context['ride_available'] = False if ride.count() == 0 else True
+        return context

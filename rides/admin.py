@@ -8,7 +8,5 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Executive)
 admin.site.register(Cab)
 admin.site.register(Ride)
-# admin.site.register(Rider)
 admin.site.register(Status)
-# admin.site.register(Place)
 

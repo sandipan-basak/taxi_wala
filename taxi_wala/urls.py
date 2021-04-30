@@ -10,9 +10,4 @@ urlpatterns = [
     path('accounts/signup/r/', rider.RiderSignUp.as_view(), name='rider_signup'),
     path('accounts/signup/e/', executive.ExecSignUp.as_view(), name='executive_signup'),
     path('admin/', admin.site.urls),
-    # path('accounts/signup/', ),
-    # path('accounts/signup/rider', django.contrib.auth.urls),
-    # path('accounts/signup/executive', django.contrib.auth.urls),
-    #path('rides/', views.index,name=''),
-    #path('logout/', views.user_logout, name='logout'),
 ]

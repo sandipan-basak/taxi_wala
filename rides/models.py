@@ -14,13 +14,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-# class Place(models.Model):
-#     pincode = models.CharField(max_length=10)
-#     state = models.CharField(max_length=120)
-#     city = models.CharField(max_length=120)
-#     country = models.CharField(max_length=120)
-#     address = models.CharField
-
 class Cab(models.Model):
     number = models.CharField(max_length=20, unique=True)
     lat = models.DecimalField(max_digits=20, decimal_places=14, default=0.0)
@@ -40,6 +33,7 @@ class Executive(models.Model):
     reg_city = models.CharField(max_length=200)
     is_engaged = models.BooleanField(default=False)
     reached_loc = models.BooleanField(default=False)
+    charges = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     def __str__(self):
         return self.user.username
 

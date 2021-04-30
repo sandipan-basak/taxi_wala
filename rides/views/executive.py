@@ -138,19 +138,23 @@ class Maps(UpdateView):
         return render(request, self.template_name, context=context)
 
 @method_decorator([login_required, executive_required], name='dispatch')
-class Payments(DetailView):
-    pass
+class Payments(TemplateView):
+    template_name = 'rides/exec/payments.html'
 
 @method_decorator([login_required, executive_required], name='dispatch')
-class EndRide(UpdateView):
-    pass
-
-
-@method_decorator([login_required, executive_required], name='dispatch')
-class Rides(ListView):
+class PastRides(ListView):
     model = Ride
-    
-    def get_queryset(self, **kwargs):
-        rider = self.request.user
-        queryset = Ride.objects.filter(rider=rider)
+    context_object_name = "rides"
+    template_name = 'rides/exec/ride_history.html'
+    queryset = Ride.objects.exclude(status=Status.objects.get(name="On Queue"))
+
+    def get_queryset(self):
+        queryset = self.queryset.filter(cabee=self.request.user.executive)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rides = self.queryset.filter(cabee=self.request.user.executive)
+        print(rides.count())
+        context['ride_available'] = False if rides.count() == 0 else True
+        return context
