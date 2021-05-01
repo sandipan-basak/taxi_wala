@@ -121,11 +121,9 @@ class PastRides(ListView):
     model = Ride
     context_object_name = "rides"
     template_name = 'rides/rider/ride_history.html'
-    # queryset = Ride.objects.exclude(status=Status.objects.get(name="On Queue"))
     
     def get_queryset(self):
         queryset = Ride.objects.exclude(status=Status.objects.get(name="On Queue")).filter(rider=self.request.user)
-        # print(queryset)
         return queryset
     
     def get_context_data(self, **kwargs):
