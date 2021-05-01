@@ -142,10 +142,9 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 
-STATIC_URL = '/static/'
+STATIC_URL = '/rides/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    '/var/www/static/',
+    os.path.join(os.path.join(BASE_DIR, 'rides'), 'static'),
 ]
 
 # MEDIA INFORMATION:
