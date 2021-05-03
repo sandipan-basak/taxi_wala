@@ -28,7 +28,7 @@ Create status for the cabs:
 
 `python manage.py add_status`
 
-Add random users (rider or partner) to the database:
+Add random users (rider or partner) to the database (create some dummy partners before the requesting for a ride):
 
 ```
 $ python manage.py populate_users -h
